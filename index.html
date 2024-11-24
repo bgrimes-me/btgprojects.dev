@@ -19,121 +19,132 @@
             --peach: #f5a97f; /* Peach */
             --yellow: #eed49f; /* Yellow */
             --red: #ed8796; /* Vibrant red */
+            --teal: #8bd5ca; /* Teal */
         }
 
-        body {
+        /* Reset */
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: var(--fg);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
         }
 
-        /* Hero Section */
-        .hero {
+        .header {
+            position: relative;
+            width: 100%; /* Ensure full page width */
             background-color: var(--bg-alt);
-            padding: 2rem;
-            text-align: center;
+            padding: 0.5rem 2rem;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            width: 90vw; /* Fill most of the viewport */
-            border-radius: 15px; /* Rounded edges */
-            max-width: 1200px; /* Limit on larger screens */
+            display: flex;
+            align-items: center;
         }
 
-        .hero h1 {
-            font-size: 2.5rem;
-            margin: 0;
-            color: var(--yellow); /* Heading color */
-            text-transform: lowercase;
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            text-align: left;
         }
 
-        /* Project Section */
+        .projects {
+            padding: 3rem 2rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
         .project-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            padding: 2rem;
-            width: 90vw; /* Ensure it fills most of the viewport */
-            border-radius: 15px; /* Rounded edges */
-            max-width: 1200px; /* Limit width for larger screens */
-            margin: 1rem auto; /* Center on page */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
         }
 
         .project-item {
             background: var(--bg-alt);
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
+            padding: 1.5rem;
+            width: 280px;
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .project-item:hover {
-            transform: translateY(-10px); /* Larger hover effect */
+            transform: translateY(-10px);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-            border: 2px solid var(--yellow); /* Yellow border on hover */
         }
 
-        .project-item a {
-            text-decoration: none;
-            color: var(--highlight);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%; /* Fill the project card */
-            box-sizing: border-box; /* Proper sizing */
-        }
-
-        .project-icon {
+        .project-item i {
             font-size: 3rem;
-            color: var(--primary);
             margin-bottom: 1rem;
         }
 
-        .project-title {
-            font-size: 1.2rem;
-            font-weight: 700;
+        .project-item .ai-icon {
+            color: var(--peach); /* Match AI Chat Interface button */
         }
 
-        /* Quote Section */
-        .quote {
-            text-align: center;
-            margin: 1rem auto;
-            padding: 1rem;
+        .project-item .more-icon {
+            color: var(--teal); /* Match More to come button */
+        }
+
+        .project-item h3 {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .project-item p {
             font-size: 1rem;
-            color: var(--red); /* Quote color */
-            width: 90vw; /* Full width with margins */
-            max-width: 800px; /* Limit width on larger screens */
-            border-radius: 15px; /* Rounded corners */
-            background: var(--bg-alt); /* Match banner background */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow for distinction */
+            margin: 0.5rem 0 1rem;
         }
 
-        /* Divider */
-        .divider {
-            height: 2px;
-            background: var(--peach); /* Peach separator */
-            width: 90vw; /* Centered and responsive */
-            max-width: 800px; /* Limit width for large screens */
-            margin: 1rem auto;
-            border-radius: 15px; /* Rounded edges */
+        .project-link {
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 700;
+            color: var(--bg);
+            transition: background-color 0.3s ease;
         }
 
-        /* Footer */
+        /* Unique button colors and hover effects */
+        .project-link.ai-chat {
+            background-color: var(--peach); /* Unique color for AI Chat Interface */
+        }
+
+        .project-link.ai-chat:hover {
+            background-color: var(--yellow); /* Complementary hover color */
+        }
+
+        .project-link.more-to-come {
+            background-color: var(--teal); /* Unique color for More to come... */
+        }
+
+        .project-link.more-to-come:hover {
+            background-color: var(--secondary); /* Complementary hover color */
+        }
+
         .footer {
-            background: var(--bg-alt);
-            padding: 1.5rem 2rem;
+            position: relative;
+            width: 100%; /* Ensure full page width */
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
             text-align: center;
-            margin-top: auto;
-            width: 90vw; /* Hug edges */
-            border-radius: 15px; /* Rounded edges */
-            max-width: 1200px; /* Limit width for larger screens */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow */
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: auto; /* Push footer to bottom */
         }
 
         .footer p {
@@ -143,82 +154,49 @@
         }
 
         .footer a {
+            color: var(--secondary);
             text-decoration: none;
             font-weight: 700;
+            transition: color 0.3s ease;
         }
 
-        .footer a.github {
-            color: var(--peach); /* Peach for GitHub */
+        .footer a:hover {
+            color: var(--highlight);
         }
 
-        .footer a.github:hover {
-            color: var(--yellow); /* Hover effect */
-        }
-
-        .footer a.site {
-            color: var(--yellow); /* Yellow for btgprojects.dev */
-        }
-
-        .footer a.site:hover {
-            color: var(--highlight); /* Green on hover */
-        }
-
-        /* Responsive Adjustments */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .quote {
-                font-size: 0.9rem;
-            }
-
-            .divider {
-                width: 95vw; /* Slightly wider for mobile */
-            }
-
-            .project-item a {
-                padding: 1rem;
-                flex-wrap: wrap; /* Ensures wrapping for narrow screens */
-            }
-
-            .project-title {
-                font-size: 1rem;
+            .project-item {
+                width: 100%;
+                max-width: 340px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>i'm ben, these are my things</h1>
-    </div>
+    <header class="header">
+        <a href="#" class="logo">btgprojects</a>
+    </header>
 
-    <section class="projects">
-        <ul class="project-list">
-            <li class="project-item">
-                <a href="https://open-webui.btgprojects.dev/auth" target="_blank">
-                    <i class="fas fa-robot project-icon"></i>
-                    <span class="project-title">AI Chat Interface</span>
-                </a>
-            </li>
-            <li class="project-item">
-                <a>
-                    <i class="fas fa-wrench project-icon"></i>
-                    <span class="project-title">More to come...</span>
-                </a>
-            </li>
-        </ul>
+    <section id="projects" class="projects">
+        <div class="project-list">
+            <div class="project-item">
+                <i class="fas fa-robot project-icon ai-icon"></i>
+                <h3>AI Chat Interface</h3>
+                <p>A conversational AI platform.</p>
+                <a href="https://open-webui.btgprojects.dev/auth" target="_blank" class="project-link ai-chat">Explore</a>
+            </div>
+            <div class="project-item">
+                <i class="fas fa-wrench project-icon more-icon"></i>
+                <h3>More to come...</h3>
+                <p>Stay tuned for upcoming projects.</p>
+                <a href="#" class="project-link more-to-come">Learn More</a>
+            </div>
+        </div>
     </section>
 
-    <div class="quote">
-        <p>"Everybody's a mad scientist, and life is their lab. We're all trying to experiment to find a way to live, to solve problems, to fend off madness and chaos." — David Cronenberg</p>
-    </div>
-
-    <div class="divider"></div>
-
     <footer class="footer">
-        <p>Check out my projects on <a href="https://github.com/btgrimes-me" class="github" target="_blank"><i class="fab fa-github"></i> GitHub</a></p>
-        <p>&copy; 2024 btgprojects | <a href="https://btgprojects.dev" class="site" target="_blank">btgprojects.dev</a></p>
+        <p>Feel free to reach out via <a href="mailto:ben.t.grimes@gmail.com">email</a> or check out my <a href="https://github.com/btgrimes-me" target="_blank">GitHub</a>.</p>
+        <p>&copy; 2024 btgprojects</p>
     </footer>
 </body>
 </html>
