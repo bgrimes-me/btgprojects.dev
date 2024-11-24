@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>btgprojects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Catppuccin Macchiato Palette */
+            --bg: #24273a;
+            --bg-alt: #1e2030;
+            --fg: #cad3f5;
+            --primary: #8aadf4;
+            --secondary: #f5bde6;
+            --accent: #b7bdf8;
+            --highlight: #a6da95;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-transform: lowercase;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1rem;
+            margin: 0.5rem 0 2rem;
+            text-align: center;
+        }
+
+        .project-list {
+            width: 100%;
+            max-width: 800px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .project-item {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-alt);
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .project-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .project-item a {
+            text-decoration: none;
+            color: var(--highlight);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .project-item a:hover {
+            color: var(--accent);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <h1>btgprojects</h1>
+    <h2>i'm ben, these are my things</h2>
+    <p>"Everybody's a mad scientist, and life is their lab. We're all trying to experiment to find a way to live, to solve problems, to fend off madness and chaos." — David Cronenberg</p>
+    
+    <ul class="project-list">
+        <li class="project-item">
+            <a href="https://open-webui.btgprojects.dev" target="_blank">open-webUI AI chat</a>
+        </li>
+        <li class="project-item">
+            <span>More to come...</span>
+        </li>
+    </ul>
+
+    <div class="footer">
+        <p>&copy; 2024 btgprojects | <a href="https://btgprojects.dev" target="_blank" style="color: var(--primary);">btgprojects.dev</a></p>
+    </div>
+</body>
+</html>
