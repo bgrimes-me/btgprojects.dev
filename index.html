@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>btgprojects</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Correct Font Awesome Link -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -12,10 +13,12 @@
             --bg: #24273a;
             --bg-alt: #1e2030;
             --fg: #cad3f5;
-            --primary: #8aadf4;
-            --secondary: #f5bde6;
-            --accent: #b7bdf8; /* Lavender for the banner */
-            --highlight: #a6da95; /* Green for "more to come" */
+            --primary: #8aadf4; /* Blue */
+            --secondary: #f5bde6; /* Pink */
+            --highlight: #a6da95; /* Green */
+            --peach: #f5a97f; /* Peach */
+            --yellow: #eed49f; /* Yellow */
+            --red: #ed8796; /* Vibrant red */
         }
 
         body {
@@ -23,81 +26,62 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: var(--fg);
-            line-height: 1.6;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 0;
-            background: linear-gradient(135deg, #1e2030 40%, #24273a 100%);
+            min-height: 100vh;
         }
 
-        .banner {
-            width: 100%;
-            background-color: var(--bg-alt); /* Reverted to original color */
-            padding: 1rem 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        /* Hero Section */
+        .hero {
+            background-color: var(--bg-alt);
+            padding: 3rem 2rem;
             text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
-        .banner h1 {
-            margin: 0;
+        .hero h1 {
             font-size: 2.5rem;
-            color: var(--primary);
+            margin: 0;
+            color: var(--primary); /* Heading color updated to primary */
             text-transform: lowercase;
         }
 
-        h2 {
-            font-size: 1.5rem;
-            color: var(--secondary);
-            margin: 1.5rem 0 1rem;
-        }
-
-        p {
-            font-size: 1rem;
-            margin: 0.5rem 0 2rem;
-            text-align: center;
-        }
-
+        /* Project Section */
         .project-list {
-            width: 100%;
-            max-width: 800px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
-            padding: 0;
-            list-style-type: none; /* Removes bullet points */
+            padding: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .project-item {
             background: var(--bg-alt);
-            border-radius: 8px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
         }
 
         .project-item:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-10px); /* Larger hover effect */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--yellow); /* Yellow border on hover */
         }
 
         .project-item a {
             text-decoration: none;
-            color: var(--highlight); /* Green for links */
-            font-size: 1.2rem;
-            font-weight: 700;
-            display: flex; /* Allows stacking of icon and text */
+            color: var(--highlight);
+            padding: 1.5rem;
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
-            height: 100%; /* Ensures full clickable area */
             width: 100%;
-        }
-
-        .project-item span {
-            color: var(--highlight); /* Green for "More to come" */
-            font-size: 1.2rem;
-            font-weight: 700;
+            box-sizing: border-box; /* Ensures proper sizing */
         }
 
         .project-icon {
@@ -106,48 +90,119 @@
             margin-bottom: 1rem;
         }
 
+        .project-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        /* Quote Section */
+        .quote {
+            text-align: center;
+            margin: 2rem auto;
+            padding: 1rem;
+            font-size: 1rem;
+            color: var(--red); /* Quote color */
+        }
+
+        /* Footer */
         .footer {
-            margin-top: 2rem;
+            background: var(--bg-alt);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
             font-size: 0.9rem;
-            color: var(--accent);
+            color: var(--fg);
         }
 
         .footer a {
-            color: var(--primary);
             text-decoration: none;
             font-weight: 700;
         }
 
-        .footer a:hover {
-            color: var(--highlight);
+        .footer a.github {
+            color: var(--peach); /* Peach for GitHub */
+        }
+
+        .footer a.github:hover {
+            color: var(--yellow); /* Hover effect */
+        }
+
+        .footer a.site {
+            color: var(--yellow); /* Yellow for btgprojects.dev */
+        }
+
+        .footer a.site:hover {
+            color: var(--highlight); /* Green on hover */
+        }
+
+        /* Divider */
+        .divider {
+            height: 2px;
+            background: var(--peach); /* Peach separator */
+            width: 80%;
+            margin: 1rem auto;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 2.5rem 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .quote {
+                font-size: 0.9rem;
+            }
+
+            .project-item a {
+                padding: 1rem;
+                flex-wrap: wrap; /* Ensures wrapping for narrow screens */
+            }
+
+            .project-title {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="banner">
-        <h1>btgprojects</h1>
+    <div class="hero">
+        <h1>i'm ben, these are my things</h1>
     </div>
-    <h2>i'm ben, these are my things</h2>
-    <p>"Everybody's a mad scientist, and life is their lab. We're all trying to experiment to find a way to live, to solve problems, to fend off madness and chaos." — David Cronenberg</p>
-    
-    <ul class="project-list">
-        <li class="project-item">
-            <a href="https://open-webui.btgprojects.dev/auth" target="_blank">
-                <i class="fas fa-robot project-icon"></i>
-                <span>AI Chat Interface</span>
-            </a>
-        </li>
-        <li class="project-item">
-            <a>
-                <i class="fas fa-wrench project-icon"></i>
-                <span>More to come...</span>
-            </a>
-        </li>
-    </ul>
 
-    <div class="footer">
-        <p>Check out my projects on <a href="https://github.com/btgrimes-me" target="_blank"><i class="fab fa-github"></i> GitHub</a></p>
-        <p>&copy; 2024 btgprojects | <a href="https://btgprojects.dev" target="_blank">btgprojects.dev</a></p>
+    <section class="projects">
+        <ul class="project-list">
+            <li class="project-item">
+                <a href="https://open-webui.btgprojects.dev/auth" target="_blank">
+                    <i class="fas fa-robot project-icon"></i>
+                    <span class="project-title">AI Chat Interface</span>
+                </a>
+            </li>
+            <li class="project-item">
+                <a>
+                    <i class="fas fa-wrench project-icon"></i>
+                    <span class="project-title">More to come...</span>
+                </a>
+            </li>
+        </ul>
+    </section>
+
+    <div class="quote">
+        <p>"Everybody's a mad scientist, and life is their lab. We're all trying to experiment to find a way to live, to solve problems, to fend off madness and chaos." — David Cronenberg</p>
     </div>
+
+    <div class="divider"></div>
+
+    <footer class="footer">
+        <p>Check out my projects on <a href="https://github.com/btgrimes-me" class="github" target="_blank"><i class="fab fa-github"></i> GitHub</a></p>
+        <p>&copy; 2024 btgprojects | <a href="https://btgprojects.dev" class="site" target="_blank">btgprojects.dev</a></p>
+    </footer>
 </body>
 </html>
