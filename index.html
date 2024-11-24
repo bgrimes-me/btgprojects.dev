@@ -27,18 +27,19 @@
             color: var(--fg);
             display: flex;
             flex-direction: column;
+            align-items: center;
             min-height: 100vh;
-            align-items: center; /* Centers all content horizontally */
         }
 
         /* Hero Section */
         .hero {
             background-color: var(--bg-alt);
-            padding: 3rem 2rem;
+            padding: 2rem;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            width: 100%; /* Full width for mobile */
-            max-width: 1200px; /* Limit width on larger screens */
+            width: 90vw; /* Fill most of the viewport */
+            border-radius: 15px; /* Rounded edges */
+            max-width: 1200px; /* Limit on larger screens */
         }
 
         .hero h1 {
@@ -54,9 +55,10 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
             padding: 2rem;
-            width: 100%; /* Ensure it fills the available space */
-            max-width: 1200px; /* Limit max width for large screens */
-            margin: 0 auto; /* Center on the page */
+            width: 90vw; /* Ensure it fills most of the viewport */
+            border-radius: 15px; /* Rounded edges */
+            max-width: 1200px; /* Limit width for larger screens */
+            margin: 1rem auto; /* Center on page */
         }
 
         .project-item {
@@ -100,21 +102,25 @@
         /* Quote Section */
         .quote {
             text-align: center;
-            margin: 2rem auto;
+            margin: 1rem auto;
             padding: 1rem;
             font-size: 1rem;
             color: var(--red); /* Quote color */
-            width: 100%; /* Full width for mobile */
+            width: 90vw; /* Full width with margins */
             max-width: 800px; /* Limit width on larger screens */
+            border-radius: 15px; /* Rounded corners */
+            background: var(--bg-alt); /* Match banner background */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow for distinction */
         }
 
         /* Divider */
         .divider {
             height: 2px;
             background: var(--peach); /* Peach separator */
-            width: 80%; /* Centered and responsive */
+            width: 90vw; /* Centered and responsive */
             max-width: 800px; /* Limit width for large screens */
             margin: 1rem auto;
+            border-radius: 15px; /* Rounded edges */
         }
 
         /* Footer */
@@ -123,8 +129,10 @@
             padding: 1.5rem 2rem;
             text-align: center;
             margin-top: auto;
-            width: 100%; /* Full width for mobile */
-            max-width: 1200px; /* Limit width for large screens */
+            width: 90vw; /* Hug edges */
+            border-radius: 15px; /* Rounded edges */
+            max-width: 1200px; /* Limit width for larger screens */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow */
         }
 
         .footer p {
@@ -156,10 +164,6 @@
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
-            .hero {
-                padding: 2.5rem 1rem;
-            }
-
             .hero h1 {
                 font-size: 2rem;
             }
@@ -169,7 +173,7 @@
             }
 
             .divider {
-                width: 90%; /* Slightly wider on mobile */
+                width: 95vw; /* Slightly wider for mobile */
             }
 
             .project-item a {
