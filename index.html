@@ -136,6 +136,18 @@
         .project-link.more-to-come:hover {
             background-color: var(--secondary); /* Complementary hover color */
         }
+        /* Encryption Puzzle Game Styling */
+        .project-item .terminal-icon {
+            color: var(--primary); /* Unique color for terminal icon */
+        }
+
+        .project-link.encryption-game {
+            background-color: var(--primary); /* Unique button color */
+        }
+
+        .project-link.encryption-game:hover {
+            background-color: var(--highlight); /* Complementary hover color */
+        }
 
         .footer {
             position: relative;
@@ -178,21 +190,27 @@
     </header>
 
     <section id="projects" class="projects">
-        <div class="project-list">
-            <div class="project-item">
-                <i class="fas fa-robot project-icon ai-icon"></i>
-                <h3>AI Chat Interface</h3>
-                <p>Powered by Ollama and Open-webUI</p>
-                <a href="https://open-webui.btgprojects.dev/auth" target="_blank" class="project-link ai-chat">Explore</a>
-            </div>
-            <div class="project-item">
-                <i class="fas fa-wrench project-icon more-icon"></i>
-                <h3>More to come...</h3>
-                <p>Stay tuned for upcoming projects.</p>
-                <a href="#" class="project-link more-to-come">Learn More</a>
-            </div>
+    <div class="project-list">
+        <div class="project-item">
+            <i class="fas fa-robot project-icon ai-icon"></i>
+            <h3>AI Chat Interface</h3>
+            <p>Powered by Ollama and Open-webUI</p>
+            <a href="https://open-webui.btgprojects.dev/auth" target="_blank" class="project-link ai-chat">Explore</a>
         </div>
-    </section>
+        <div class="project-item">
+            <i class="fas fa-terminal project-icon terminal-icon"></i>
+            <h3>EscCTRL (Preview)</h3>
+            <p>A terminal-based puzzle game.</p>
+            <a href="/game/index.html" target="_blank" class="project-link encryption-game">Play Now</a>
+        </div>
+        <div class="project-item">
+            <i class="fas fa-wrench project-icon more-icon"></i>
+            <h3>More to come...</h3>
+            <p>Stay tuned for upcoming projects.</p>
+            <a href="#" class="project-link more-to-come">Learn More</a>
+        </div>
+    </div>
+</section>
 
     <footer class="footer">
         <p>© 2024 btgprojects. Original content by btgprojects.</p>
