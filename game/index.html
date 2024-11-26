@@ -3,34 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encryption Puzzle</title>
+    <title>EscCTRL - Encryption Puzzle</title>
     <style>
         body {
             background: black;
             color: green;
             font-family: monospace;
+            padding: 0;
+            margin: 0;
         }
         #terminal {
             padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: flicker 1.5s infinite alternate;
         }
-        .file-entry {
-            margin-bottom: 10px;
+        #files {
+            margin-top: 20px;
         }
         #input {
-            width: 100%;
+            width: calc(100% - 40px);
             padding: 10px;
             font-size: 16px;
+            margin: 20px 20px 0 20px;
             background: black;
             color: green;
             border: 1px solid green;
+        }
+        .file-unlocked {
+            color: lime;
+            font-weight: bold;
+            text-shadow: 0 0 10px lime;
+        }
+        .file-encrypted {
+            color: red;
+            font-weight: bold;
+            text-shadow: 0 0 10px red;
+        }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
     <div id="terminal">
         <div id="files"></div>
-        <input type="text" id="input" placeholder="Type the key here" autocomplete="off" />
     </div>
-    <script src="script.js"></script>
+    <input type="text" id="input" placeholder="Type the key here" autocomplete="off" />
+    <script src="game.js"></script>
 </body>
 </html>
