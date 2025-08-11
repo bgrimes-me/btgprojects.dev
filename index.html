@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Projects by btgprojects: AI tools, games and more">
     <title>btgprojects</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -22,30 +23,52 @@
             --teal: #8bd5ca; /* Teal */
         }
 
-        /* Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html, body {
-            width: 100%;
+        html {
             height: 100%;
+        }
+
+        body {
+            min-height: 100%;
             overflow-x: hidden; /* Prevent horizontal scrolling */
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: var(--fg);
             display: flex;
             flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .skip-link {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .skip-link:focus {
+            left: 0;
+            width: auto;
+            height: auto;
+            padding: 1rem;
+            background: var(--highlight);
+            color: var(--bg);
+            z-index: 1000;
         }
 
         .header {
-            position: relative;
-            width: 100%; /* Ensure full page width */
             background-color: var(--bg-alt);
             padding: 0.5rem 2rem;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav {
             display: flex;
             align-items: center;
         }
@@ -55,7 +78,6 @@
             color: var(--primary);
             text-decoration: none;
             font-weight: 700;
-            text-align: left;
         }
 
         .projects {
@@ -63,13 +85,11 @@
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            text-align: center;
         }
 
         .project-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
         }
 
@@ -78,12 +98,12 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             padding: 1.5rem;
-            width: 280px;
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .project-item:hover {
+        .project-item:hover,
+        .project-item:focus-within {
             transform: translateY(-10px);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
         }
@@ -94,11 +114,15 @@
         }
 
         .project-item .ai-icon {
-            color: var(--peach); /* Match AI Chat Interface button */
+            color: var(--peach);
         }
 
         .project-item .more-icon {
-            color: var(--teal); /* Match More to come button */
+            color: var(--teal);
+        }
+
+        .project-item .terminal-icon {
+            color: var(--primary);
         }
 
         .project-item h3 {
@@ -117,100 +141,108 @@
             text-decoration: none;
             font-weight: 700;
             color: var(--bg);
-            transition: background-color 0.3s ease;
+            display: inline-block;
         }
 
-        /* Unique button colors and hover effects */
         .project-link.ai-chat {
-            background-color: var(--peach); /* Unique color for AI Chat Interface */
+            background-color: var(--peach);
         }
 
-        .project-link.ai-chat:hover {
-            background-color: var(--yellow); /* Complementary hover color */
+        .project-link.ai-chat:hover,
+        .project-link.ai-chat:focus {
+            background-color: var(--yellow);
         }
 
         .project-link.more-to-come {
-            background-color: var(--teal); /* Unique color for More to come... */
+            background-color: var(--teal);
         }
 
-        .project-link.more-to-come:hover {
-            background-color: var(--secondary); /* Complementary hover color */
-        }
-        /* Encryption Puzzle Game Styling */
-        .project-item .terminal-icon {
-            color: var(--primary); /* Unique color for terminal icon */
+        .project-link.more-to-come:hover,
+        .project-link.more-to-come:focus {
+            background-color: var(--secondary);
         }
 
         .project-link.encryption-game {
-            background-color: var(--primary); /* Unique button color */
+            background-color: var(--primary);
         }
 
-        .project-link.encryption-game:hover {
-            background-color: var(--highlight); /* Complementary hover color */
+        .project-link.encryption-game:hover,
+        .project-link.encryption-game:focus {
+            background-color: var(--highlight);
+        }
+
+        .project-link:focus-visible {
+            outline: 3px solid var(--highlight);
+            outline-offset: 2px;
         }
 
         .footer {
-            position: relative;
-            width: 100%; /* Ensure full page width */
             background-color: var(--bg-alt);
             padding: 0.5rem 2rem;
             text-align: center;
             box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
-            margin-top: auto; /* Push footer to bottom */
+            margin-top: auto;
         }
 
         .footer p {
             margin: 0.5rem 0;
             font-size: 0.9rem;
-            color: var(--fg);
         }
 
         .footer a {
             color: var(--secondary);
             text-decoration: none;
             font-weight: 700;
-            transition: color 0.3s ease;
         }
 
-        .footer a:hover {
+        .footer a:hover,
+        .footer a:focus {
             color: var(--highlight);
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+
         @media (max-width: 768px) {
-            .project-item {
-                width: 100%;
-                max-width: 340px;
+            .projects {
+                padding: 2rem 1rem;
             }
         }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="header">
-        <a href="#" class="logo">btgprojects</a>
+        <nav class="nav" aria-label="Main navigation">
+            <a href="#" class="logo">btgprojects</a>
+        </nav>
     </header>
 
-    <section id="projects" class="projects">
-    <div class="project-list">
-        <div class="project-item">
-            <i class="fas fa-robot project-icon ai-icon"></i>
-            <h3>AI Chat Interface</h3>
-            <p>Powered by Ollama and Open-webUI</p>
-            <a href="https://open-webui.btgprojects.dev/auth" target="_blank" class="project-link ai-chat">Explore</a>
+    <main id="main-content" class="projects">
+        <div class="project-list">
+            <article class="project-item">
+                <i class="fas fa-robot project-icon ai-icon" aria-hidden="true"></i>
+                <h3>AI Chat Interface</h3>
+                <p>Powered by Ollama and Open-webUI</p>
+                <a href="https://open-webui.btgprojects.dev/auth" target="_blank" class="project-link ai-chat" aria-label="Explore the AI Chat Interface">Explore</a>
+            </article>
+            <article class="project-item">
+                <i class="fas fa-terminal project-icon terminal-icon" aria-hidden="true"></i>
+                <h3>EscCTRL (Preview)</h3>
+                <p>A terminal-based puzzle game.</p>
+                <a href="/game/index.html" target="_blank" class="project-link encryption-game" aria-label="Play EscCTRL preview">Play Now</a>
+            </article>
+            <article class="project-item">
+                <i class="fas fa-wrench project-icon more-icon" aria-hidden="true"></i>
+                <h3>More to come...</h3>
+                <p>Stay tuned for upcoming projects.</p>
+                <a href="#" class="project-link more-to-come" aria-label="Learn more about upcoming projects">Learn More</a>
+            </article>
         </div>
-        <div class="project-item">
-            <i class="fas fa-terminal project-icon terminal-icon"></i>
-            <h3>EscCTRL (Preview)</h3>
-            <p>A terminal-based puzzle game.</p>
-            <a href="/game/index.html" target="_blank" class="project-link encryption-game">Play Now</a>
-        </div>
-        <div class="project-item">
-            <i class="fas fa-wrench project-icon more-icon"></i>
-            <h3>More to come...</h3>
-            <p>Stay tuned for upcoming projects.</p>
-            <a href="#" class="project-link more-to-come">Learn More</a>
-        </div>
-    </div>
-</section>
+    </main>
 
     <footer class="footer">
         <p>© 2024 btgprojects. Original content by btgprojects. Additional content and help from <a href="/acknowledgements/index.html" target="_blank">others</a></p>
