@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Diff Checker - Compare text differences side-by-side">
+    <title>Diff Checker - btgprojects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            /* Catppuccin Macchiato Palette */
+            --bg: #24273a;
+            --bg-alt: #1e2030;
+            --fg: #cad3f5;
+            --primary: #8aadf4;
+            --secondary: #f5bde6;
+            --highlight: #a6da95;
+            --peach: #f5a97f;
+            --yellow: #eed49f;
+            --red: #ed8796;
+            --teal: #8bd5ca;
+            
+            /* Diff colors */
+            --added-bg: rgba(166, 218, 149, 0.2);
+            --added-fg: #a6da95;
+            --deleted-bg: rgba(237, 135, 150, 0.2);
+            --deleted-fg: #ed8796;
+            --modified-bg: rgba(238, 212, 159, 0.2);
+            --modified-fg: #eed49f;
+            --char-added: rgba(166, 218, 149, 0.4);
+            --char-deleted: rgba(237, 135, 150, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover,
+        .back-link:focus {
+            color: var(--highlight);
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .tool-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .input-section {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .input-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .input-header h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .clear-btn {
+            padding: 0.25rem 0.75rem;
+            background: var(--red);
+            color: var(--bg);
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .clear-btn:hover {
+            background: var(--peach);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 1rem;
+            background: var(--bg);
+            color: var(--fg);
+            border: 2px solid var(--bg);
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .options-section {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .options-grid {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option-group label {
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            color: var(--fg);
+            border: 2px solid var(--bg);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn.active {
+            background: var(--primary);
+            color: var(--bg);
+            border-color: var(--primary);
+        }
+
+        .view-btn:hover:not(.active) {
+            border-color: var(--primary);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--bg);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--highlight);
+        }
+
+        .results-section {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .results-header h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-added { color: var(--added-fg); }
+        .stat-deleted { color: var(--deleted-fg); }
+        .stat-modified { color: var(--modified-fg); }
+
+        .diff-container {
+            background: var(--bg);
+            border-radius: 5px;
+            overflow: auto;
+            max-height: 600px;
+        }
+
+        /* Side-by-side view */
+        .diff-side-by-side {
+            display: grid;
+            grid-template-columns: 50px 1fr 50px 1fr;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .line-number {
+            padding: 0.25rem 0.5rem;
+            text-align: right;
+            background: var(--bg-alt);
+            color: var(--fg);
+            opacity: 0.5;
+            user-select: none;
+            border-right: 1px solid var(--bg);
+        }
+
+        .line-content {
+            padding: 0.25rem 0.75rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .line-added {
+            background: var(--added-bg);
+            color: var(--added-fg);
+        }
+
+        .line-deleted {
+            background: var(--deleted-bg);
+            color: var(--deleted-fg);
+        }
+
+        .line-modified {
+            background: var(--modified-bg);
+            color: var(--modified-fg);
+        }
+
+        .line-unchanged {
+            color: var(--fg);
+            opacity: 0.6;
+        }
+
+        .char-added {
+            background: var(--char-added);
+            font-weight: 700;
+        }
+
+        .char-deleted {
+            background: var(--char-deleted);
+            font-weight: 700;
+        }
+
+        /* Inline view */
+        .diff-inline {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .inline-line {
+            display: flex;
+        }
+
+        .inline-marker {
+            padding: 0.25rem 0.5rem;
+            width: 40px;
+            text-align: center;
+            font-weight: 700;
+            user-select: none;
+        }
+
+        .inline-marker.added { background: var(--added-bg); color: var(--added-fg); }
+        .inline-marker.deleted { background: var(--deleted-bg); color: var(--deleted-fg); }
+        .inline-marker.unchanged { background: var(--bg-alt); color: var(--fg); opacity: 0.3; }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--fg);
+            opacity: 0.5;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .footer {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: auto;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover {
+            color: var(--highlight);
+        }
+
+        @media (max-width: 1200px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .diff-side-by-side {
+                grid-template-columns: 40px 1fr;
+            }
+
+            .diff-side-by-side .line-number:nth-child(4n+3),
+            .diff-side-by-side .line-content:nth-child(4n+4) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .tool-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .view-toggle {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+
+            .view-btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">btgprojects</a>
+            <a href="/" class="back-link">← Back to Home</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="tool-header">
+            <h1>📊 Diff Checker</h1>
+            <p>Compare text differences with side-by-side or inline view</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-grid">
+                <div class="input-panel">
+                    <div class="input-header">
+                        <h3>Original Text</h3>
+                        <button class="clear-btn" onclick="clearText('original')">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                    <textarea id="originalText" placeholder="Paste your original text here..."></textarea>
+                </div>
+
+                <div class="input-panel">
+                    <div class="input-header">
+                        <h3>Modified Text</h3>
+                        <button class="clear-btn" onclick="clearText('modified')">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                    <textarea id="modifiedText" placeholder="Paste your modified text here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="options-section">
+            <div class="options-grid">
+                <div class="option-group">
+                    <input type="checkbox" id="ignoreWhitespace" onchange="compareDiff()">
+                    <label for="ignoreWhitespace">Ignore Whitespace</label>
+                </div>
+
+                <div class="option-group">
+                    <input type="checkbox" id="caseSensitive" checked onchange="compareDiff()">
+                    <label for="caseSensitive">Case Sensitive</label>
+                </div>
+
+                <div class="option-group">
+                    <input type="checkbox" id="showUnchanged" checked onchange="compareDiff()">
+                    <label for="showUnchanged">Show Unchanged Lines</label>
+                </div>
+
+                <div class="view-toggle">
+                    <button class="view-btn active" id="sideBtn" onclick="setView('side')">
+                        <i class="fas fa-columns"></i> Side-by-Side
+                    </button>
+                    <button class="view-btn" id="inlineBtn" onclick="setView('inline')">
+                        <i class="fas fa-list"></i> Inline
+                    </button>
+                </div>
+            </div>
+
+            <div class="button-group" style="margin-top: 1rem;">
+                <button class="btn-primary" onclick="compareDiff()">
+                    <i class="fas fa-search"></i> Compare Differences
+                </button>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <h3>Comparison Results</h3>
+                <div class="stats" id="statsDisplay">
+                    <div class="stat stat-added">
+                        <i class="fas fa-plus-circle"></i>
+                        <span id="addedCount">0 added</span>
+                    </div>
+                    <div class="stat stat-deleted">
+                        <i class="fas fa-minus-circle"></i>
+                        <span id="deletedCount">0 deleted</span>
+                    </div>
+                    <div class="stat stat-modified">
+                        <i class="fas fa-edit"></i>
+                        <span id="modifiedCount">0 modified</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diff-container" id="diffContainer">
+                <div class="empty-state">
+                    <i class="fas fa-equals"></i>
+                    <div>No differences found</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 btgprojects. Original content by btgprojects.</p>
+        <p>Feel free to reach out via <a href="mailto:contact.btgprojects@gmail.com">email</a> or check out my <a href="https://github.com/bgrimes-me" target="_blank">GitHub</a>.</p>
+    </footer>
+
+    <script>
+        let currentView = 'side';
+        let diffResult = null;
+
+        function clearText(which) {
+            if (which === 'original') {
+                document.getElementById('originalText').value = '';
+            } else {
+                document.getElementById('modifiedText').value = '';
+            }
+        }
+
+        function setView(view) {
+            currentView = view;
+            document.getElementById('sideBtn').classList.toggle('active', view === 'side');
+            document.getElementById('inlineBtn').classList.toggle('active', view === 'inline');
+            if (diffResult) {
+                renderDiff(diffResult);
+            }
+        }
+
+        function preprocessText(text, ignoreWhitespace, caseSensitive) {
+            if (ignoreWhitespace) {
+                text = text.replace(/\s+/g, ' ').trim();
+            }
+            if (!caseSensitive) {
+                text = text.toLowerCase();
+            }
+            return text;
+        }
+
+        function compareDiff() {
+            const originalText = document.getElementById('originalText').value;
+            const modifiedText = document.getElementById('modifiedText').value;
+
+            if (!originalText && !modifiedText) {
+                alert('Please enter text in both fields');
+                return;
+            }
+
+            const ignoreWhitespace = document.getElementById('ignoreWhitespace').checked;
+            const caseSensitive = document.getElementById('caseSensitive').checked;
+
+            const original = originalText.split('\n');
+            const modified = modifiedText.split('\n');
+
+            diffResult = computeDiff(original, modified, ignoreWhitespace, caseSensitive);
+            renderDiff(diffResult);
+            updateStats(diffResult);
+
+            document.getElementById('resultsSection').style.display = 'block';
+        }
+
+        function computeDiff(original, modified, ignoreWhitespace, caseSensitive) {
+            const diff = [];
+            const dp = [];
+
+            // Preprocess lines
+            const origProcessed = original.map(line => preprocessText(line, ignoreWhitespace, caseSensitive));
+            const modProcessed = modified.map(line => preprocessText(line, ignoreWhitespace, caseSensitive));
+
+            // LCS algorithm
+            for (let i = 0; i <= original.length; i++) {
+                dp[i] = [];
+                for (let j = 0; j <= modified.length; j++) {
+                    if (i === 0 || j === 0) {
+                        dp[i][j] = 0;
+                    } else if (origProcessed[i - 1] === modProcessed[j - 1]) {
+                        dp[i][j] = dp[i - 1][j - 1] + 1;
+                    } else {
+                        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                    }
+                }
+            }
+
+            // Backtrack to find differences
+            let i = original.length;
+            let j = modified.length;
+
+            while (i > 0 || j > 0) {
+                if (i > 0 && j > 0 && origProcessed[i - 1] === modProcessed[j - 1]) {
+                    diff.unshift({
+                        type: 'unchanged',
+                        originalLine: i - 1,
+                        modifiedLine: j - 1,
+                        originalText: original[i - 1],
+                        modifiedText: modified[j - 1]
+                    });
+                    i--;
+                    j--;
+                } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+                    diff.unshift({
+                        type: 'added',
+                        originalLine: null,
+                        modifiedLine: j - 1,
+                        originalText: '',
+                        modifiedText: modified[j - 1]
+                    });
+                    j--;
+                } else if (i > 0 && (j === 0 || dp[i][j - 1] < dp[i - 1][j])) {
+                    diff.unshift({
+                        type: 'deleted',
+                        originalLine: i - 1,
+                        modifiedLine: null,
+                        originalText: original[i - 1],
+                        modifiedText: ''
+                    });
+                    i--;
+                }
+            }
+
+            // Detect character-level changes in modified lines
+            for (let k = 0; k < diff.length - 1; k++) {
+                if (diff[k].type === 'deleted' && diff[k + 1].type === 'added') {
+                    diff[k].type = 'modified';
+                    diff[k].modifiedLine = diff[k + 1].modifiedLine;
+                    diff[k].modifiedText = diff[k + 1].modifiedText;
+                    diff[k].charDiff = computeCharDiff(diff[k].originalText, diff[k].modifiedText);
+                    diff.splice(k + 1, 1);
+                }
+            }
+
+            return diff;
+        }
+
+        function computeCharDiff(str1, str2) {
+            const dp = [];
+            for (let i = 0; i <= str1.length; i++) {
+                dp[i] = [];
+                for (let j = 0; j <= str2.length; j++) {
+                    if (i === 0) dp[i][j] = j;
+                    else if (j === 0) dp[i][j] = i;
+                    else if (str1[i - 1] === str2[j - 1]) dp[i][j] = dp[i - 1][j - 1];
+                    else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+                }
+            }
+
+            // Backtrack
+            let i = str1.length;
+            let j = str2.length;
+            const result = { original: '', modified: '' };
+
+            while (i > 0 || j > 0) {
+                if (i > 0 && j > 0 && str1[i - 1] === str2[j - 1]) {
+                    result.original = str1[i - 1] + result.original;
+                    result.modified = str2[j - 1] + result.modified;
+                    i--;
+                    j--;
+                } else if (j > 0 && (i === 0 || dp[i][j - 1] <= dp[i - 1][j])) {
+                    result.modified = `<span class="char-added">${escapeHtml(str2[j - 1])}</span>` + result.modified;
+                    j--;
+                } else if (i > 0) {
+                    result.original = `<span class="char-deleted">${escapeHtml(str1[i - 1])}</span>` + result.original;
+                    i--;
+                }
+            }
+
+            return result;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function renderDiff(diff) {
+            const container = document.getElementById('diffContainer');
+            const showUnchanged = document.getElementById('showUnchanged').checked;
+
+            const filteredDiff = showUnchanged ? diff : diff.filter(line => line.type !== 'unchanged');
+
+            if (filteredDiff.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-equals"></i><div>No differences found</div></div>';
+                return;
+            }
+
+            if (currentView === 'side') {
+                renderSideBySide(filteredDiff, container);
+            } else {
+                renderInline(filteredDiff, container);
+            }
+        }
+
+        function renderSideBySide(diff, container) {
+            let html = '<div class="diff-side-by-side">';
+
+            diff.forEach(line => {
+                const origLineNum = line.originalLine !== null ? line.originalLine + 1 : '';
+                const modLineNum = line.modifiedLine !== null ? line.modifiedLine + 1 : '';
+
+                let origClass = 'line-unchanged';
+                let modClass = 'line-unchanged';
+                let origContent = escapeHtml(line.originalText);
+                let modContent = escapeHtml(line.modifiedText);
+
+                if (line.type === 'deleted') {
+                    origClass = 'line-deleted';
+                    modClass = '';
+                } else if (line.type === 'added') {
+                    origClass = '';
+                    modClass = 'line-added';
+                } else if (line.type === 'modified') {
+                    origClass = 'line-modified';
+                    modClass = 'line-modified';
+                    if (line.charDiff) {
+                        origContent = line.charDiff.original;
+                        modContent = line.charDiff.modified;
+                    }
+                }
+
+                html += `
+                    <div class="line-number">${origLineNum}</div>
+                    <div class="line-content ${origClass}">${origContent || '&nbsp;'}</div>
+                    <div class="line-number">${modLineNum}</div>
+                    <div class="line-content ${modClass}">${modContent || '&nbsp;'}</div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderInline(diff, container) {
+            let html = '<div class="diff-inline">';
+
+            diff.forEach(line => {
+                if (line.type === 'deleted') {
+                    const content = escapeHtml(line.originalText);
+                    html += `
+                        <div class="inline-line">
+                            <div class="inline-marker deleted">-</div>
+                            <div class="line-content line-deleted">${content}</div>
+                        </div>
+                    `;
+                } else if (line.type === 'added') {
+                    const content = escapeHtml(line.modifiedText);
+                    html += `
+                        <div class="inline-line">
+                            <div class="inline-marker added">+</div>
+                            <div class="line-content line-added">${content}</div>
+                        </div>
+                    `;
+                } else if (line.type === 'modified') {
+                    const origContent = line.charDiff ? line.charDiff.original : escapeHtml(line.originalText);
+                    const modContent = line.charDiff ? line.charDiff.modified : escapeHtml(line.modifiedText);
+                    html += `
+                        <div class="inline-line">
+                            <div class="inline-marker deleted">-</div>
+                            <div class="line-content line-deleted">${origContent}</div>
+                        </div>
+                        <div class="inline-line">
+                            <div class="inline-marker added">+</div>
+                            <div class="line-content line-added">${modContent}</div>
+                        </div>
+                    `;
+                } else if (line.type === 'unchanged') {
+                    html += `
+                        <div class="inline-line">
+                            <div class="inline-marker unchanged">&nbsp;</div>
+                            <div class="line-content line-unchanged">${escapeHtml(line.originalText)}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function updateStats(diff) {
+            const added = diff.filter(line => line.type === 'added').length;
+            const deleted = diff.filter(line => line.type === 'deleted').length;
+            const modified = diff.filter(line => line.type === 'modified').length;
+
+            document.getElementById('addedCount').textContent = `${added} added`;
+            document.getElementById('deletedCount').textContent = `${deleted} deleted`;
+            document.getElementById('modifiedCount').textContent = `${modified} modified`;
+        }
+    </script>
+</body>
+</html>
