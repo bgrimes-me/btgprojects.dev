@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>DESCENT — A Dungeon Crawler</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0a0a0f;
+    --panel: #12121a;
+    --gold: #f0c040;
+    --gold-dim: #a08020;
+    --hp: #e04040;
+    --hp-bg: #401515;
+    --xp: #40b0e0;
+    --xp-bg: #102030;
+    --wall: #2a2a3a;
+    --floor: #18182a;
+    --floor-alt: #1c1c30;
+    --text: #c8c8d8;
+    --text-dim: #606078;
+    --accent: #b060ff;
+    --monster: #ff4060;
+    --potion: #40e080;
+    --stairs: #f0c040;
+    --fog: #0a0a0f;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  #game-container {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+
+  /* === TOP HUD === */
+  #hud {
+    padding: 8px 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--panel);
+    border-bottom: 1px solid #ffffff10;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .hud-left { display: flex; gap: 12px; align-items: center; }
+  .hud-right { display: flex; gap: 12px; align-items: center; }
+
+  .hud-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--gold), #fff8e0, var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 700;
+  }
+  .stat-icon { font-size: 14px; }
+  .stat-hp { color: var(--hp); }
+  .stat-gold { color: var(--gold); }
+  .stat-lvl { color: var(--xp); }
+  .stat-floor { color: var(--accent); }
+  .stat-atk { color: #ff8060; }
+
+  /* === BARS === */
+  #bars {
+    padding: 4px 12px 6px;
+    background: var(--panel);
+    display: flex; flex-direction: column; gap: 3px;
+    flex-shrink: 0;
+  }
+  .bar-row { display: flex; align-items: center; gap: 6px; }
+  .bar-label { font-size: 9px; font-weight: 700; width: 20px; text-align: right; }
+  .bar-track {
+    flex: 1; height: 8px; border-radius: 4px;
+    overflow: hidden; position: relative;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 4px;
+    transition: width 0.3s ease;
+    position: relative;
+  }
+  .bar-fill::after {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 50%;
+    background: linear-gradient(to bottom, #ffffff20, transparent);
+    border-radius: 4px 4px 0 0;
+  }
+  .bar-hp .bar-track { background: var(--hp-bg); }
+  .bar-hp .bar-fill { background: linear-gradient(90deg, #c03030, var(--hp)); }
+  .bar-xp .bar-track { background: var(--xp-bg); }
+  .bar-xp .bar-fill { background: linear-gradient(90deg, #2080b0, var(--xp)); }
+  .bar-text {
+    font-size: 9px; color: var(--text-dim); min-width: 50px;
+  }
+
+  /* === MAP AREA === */
+  #map-area {
+    flex: 1; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  #map-canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  /* === LOG === */
+  #log {
+    height: 60px;
+    padding: 4px 12px;
+    background: var(--panel);
+    border-top: 1px solid #ffffff10;
+    overflow-y: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+  }
+  #log::-webkit-scrollbar { display: none; }
+  .log-line {
+    font-size: 11px; line-height: 1.4;
+    color: var(--text-dim);
+    animation: logIn 0.2s ease;
+  }
+  .log-line.combat { color: var(--hp); }
+  .log-line.loot { color: var(--gold); }
+  .log-line.level { color: var(--xp); }
+  .log-line.descend { color: var(--accent); }
+  .log-line.heal { color: var(--potion); }
+  .log-line.death { color: #ff2040; font-weight: 700; }
+
+  @keyframes logIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === CONTROLS === */
+  #controls {
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    background: var(--panel);
+    border-top: 1px solid #ffffff10;
+    display: flex; justify-content: center; align-items: center;
+    flex-shrink: 0;
+  }
+
+  .dpad {
+    display: grid;
+    grid-template-columns: 48px 48px 48px;
+    grid-template-rows: 48px 48px 48px;
+    gap: 3px;
+  }
+
+  .dpad-btn {
+    width: 48px; height: 48px;
+    background: #1e1e30;
+    border: 1px solid #ffffff15;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .dpad-btn:active {
+    background: #2a2a40;
+    color: var(--text);
+    transform: scale(0.92);
+  }
+  .dpad-center {
+    background: transparent;
+    border-color: transparent;
+    font-size: 12px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+  .dpad-blank { background: transparent; border-color: transparent; }
+
+  #wait-btn {
+    position: absolute; right: 20px;
+    width: 48px; height: 48px;
+    background: #1e1e30; border: 1px solid #ffffff15; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--text-dim); cursor: pointer;
+  }
+  #wait-btn:active { background: #2a2a40; transform: scale(0.92); }
+
+  /* === OVERLAY SCREENS === */
+  .overlay {
+    position: absolute; inset: 0;
+    background: #0a0a0fee;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.5s ease;
+    padding: 20px;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .overlay h1 {
+    font-family: 'Cinzel', serif;
+    font-weight: 900; font-size: 36px;
+    letter-spacing: 6px;
+    background: linear-gradient(135deg, var(--gold), #fff8e0, var(--gold-dim));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .overlay h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 14px; color: var(--text-dim);
+    letter-spacing: 4px; margin-bottom: 30px;
+  }
+  .overlay .subtitle {
+    font-size: 12px; color: var(--text-dim);
+    text-align: center; max-width: 280px;
+    line-height: 1.6; margin-bottom: 30px;
+  }
+
+  .play-btn {
+    font-family: 'Cinzel', serif;
+    font-weight: 700; font-size: 16px;
+    letter-spacing: 4px;
+    color: var(--bg);
+    background: linear-gradient(135deg, var(--gold), #ffe080);
+    border: none; border-radius: 8px;
+    padding: 14px 40px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px #f0c04060;
+  }
+  .play-btn:active { transform: scale(0.95); }
+
+  .death-overlay h1 {
+    background: linear-gradient(135deg, var(--hp), #ff8080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px 24px; margin: 20px 0;
+    font-size: 13px;
+  }
+  .stats-grid .label { color: var(--text-dim); text-align: right; }
+  .stats-grid .value { color: var(--text); font-weight: 700; }
+
+  /* Flash effect */
+  .flash {
+    position: absolute; inset: 0;
+    pointer-events: none; z-index: 50;
+    animation: flash 0.15s ease-out;
+  }
+  .flash-damage { background: #ff000030; }
+  .flash-heal { background: #40e08030; }
+  .flash-gold { background: #f0c04020; }
+  .flash-descend { background: #b060ff30; }
+  @keyframes flash { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Level up notification */
+  .levelup-notif {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel', serif;
+    font-weight: 900; font-size: 24px;
+    color: var(--xp);
+    text-shadow: 0 0 20px #40b0e060;
+    letter-spacing: 4px;
+    z-index: 60; pointer-events: none;
+    animation: levelUp 1.2s ease-out forwards;
+  }
+  @keyframes levelUp {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    40% { transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
+  }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-left">
+      <span class="hud-title">DESCENT</span>
+    </div>
+    <div class="hud-right">
+      <span class="stat stat-floor"><span class="stat-icon">▼</span> F<span id="hud-floor">1</span></span>
+      <span class="stat stat-atk"><span class="stat-icon">⚔</span> <span id="hud-atk">2</span></span>
+      <span class="stat stat-gold"><span class="stat-icon">●</span> <span id="hud-gold">0</span></span>
+    </div>
+  </div>
+
+  <!-- Bars -->
+  <div id="bars">
+    <div class="bar-row bar-hp">
+      <span class="bar-label stat-hp">HP</span>
+      <div class="bar-track"><div class="bar-fill" id="hp-fill" style="width:100%"></div></div>
+      <span class="bar-text" id="hp-text">20/20</span>
+    </div>
+    <div class="bar-row bar-xp">
+      <span class="bar-label stat-lvl">XP</span>
+      <div class="bar-track"><div class="bar-fill" id="xp-fill" style="width:0%"></div></div>
+      <span class="bar-text" id="xp-text">Lv 1 — 0/5</span>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div id="map-area">
+    <canvas id="map-canvas"></canvas>
+  </div>
+
+  <!-- Log -->
+  <div id="log"></div>
+
+  <!-- Controls -->
+  <div id="controls">
+    <div class="dpad">
+      <div class="dpad-btn dpad-blank"></div>
+      <div class="dpad-btn" data-dir="0,-1">▲</div>
+      <div class="dpad-btn dpad-blank"></div>
+      <div class="dpad-btn" data-dir="-1,0">◀</div>
+      <div class="dpad-btn dpad-center">⏺</div>
+      <div class="dpad-btn" data-dir="1,0">▶</div>
+      <div class="dpad-btn dpad-blank"></div>
+      <div class="dpad-btn" data-dir="0,1">▼</div>
+      <div class="dpad-btn dpad-blank"></div>
+    </div>
+    <div id="wait-btn" onclick="game.waitTurn()">⏳</div>
+  </div>
+
+  <!-- Title Screen -->
+  <div class="overlay" id="title-screen">
+    <h1>DESCENT</h1>
+    <h2>INTO DARKNESS</h2>
+    <p class="subtitle">
+      Explore procedurally generated dungeons. Slay monsters. Collect gold. Descend deeper.<br><br>
+      Swipe or use the D-pad to move. Bump into monsters to attack.
+    </p>
+    <button class="play-btn" id="start-btn">BEGIN</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  DESCENT — A Dungeon Crawler Roguelike
+// ============================================================
+
+const TILE = {
+  VOID: 0, WALL: 1, FLOOR: 2, CORRIDOR: 3,
+  STAIRS: 4, GOLD: 5, POTION: 6
+};
+
+const MONSTERS = [
+  { name: 'Rat',       ch: 'r', color: '#a08060', hp: 3,  atk: 1, xp: 1, minFloor: 1 },
+  { name: 'Bat',       ch: 'b', color: '#8070a0', hp: 4,  atk: 1, xp: 1, minFloor: 1 },
+  { name: 'Goblin',    ch: 'g', color: '#60a040', hp: 6,  atk: 2, xp: 2, minFloor: 2 },
+  { name: 'Skeleton',  ch: 's', color: '#d0d0c0', hp: 8,  atk: 3, xp: 3, minFloor: 3 },
+  { name: 'Orc',       ch: 'o', color: '#40a060', hp: 12, atk: 4, xp: 4, minFloor: 4 },
+  { name: 'Wraith',    ch: 'w', color: '#a0a0ff', hp: 10, atk: 5, xp: 5, minFloor: 5 },
+  { name: 'Troll',     ch: 'T', color: '#80b060', hp: 18, atk: 6, xp: 7, minFloor: 6 },
+  { name: 'Dragon',    ch: 'D', color: '#ff6040', hp: 30, atk: 8, xp: 12, minFloor: 8 },
+];
+
+class Game {
+  constructor() {
+    this.canvas = document.getElementById('map-canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.log = document.getElementById('log');
+    this.running = false;
+    this.tileSize = 20;
+    this.viewRadius = 6;
+    this.setupInput();
+  }
+
+  start() {
+    this.floor = 1;
+    this.player = {
+      x: 0, y: 0,
+      hp: 20, maxHp: 20,
+      atk: 2, def: 0,
+      xp: 0, level: 1, xpNext: 5,
+      gold: 0, kills: 0
+    };
+    this.turns = 0;
+    this.log.innerHTML = '';
+    this.generateLevel();
+    this.running = true;
+    this.render();
+    this.addLog('You descend into the darkness...', 'descend');
+  }
+
+  // === MAP GENERATION (BSP-ish rooms + corridors) ===
+  generateLevel() {
+    const W = 40, H = 30;
+    this.mapW = W; this.mapH = H;
+    this.map = Array.from({ length: H }, () => new Uint8Array(W));
+    this.seen = Array.from({ length: H }, () => new Uint8Array(W));
+    this.visible = Array.from({ length: H }, () => new Uint8Array(W));
+    this.monsters = [];
+    this.items = [];
+
+    // Generate rooms
+    this.rooms = [];
+    const attempts = 60;
+    for (let i = 0; i < attempts; i++) {
+      const rw = 4 + Math.floor(Math.random() * 5);
+      const rh = 3 + Math.floor(Math.random() * 4);
+      const rx = 1 + Math.floor(Math.random() * (W - rw - 2));
+      const ry = 1 + Math.floor(Math.random() * (H - rh - 2));
+      if (!this.rooms.some(r =>
+        rx - 1 < r.x + r.w + 1 && rx + rw + 1 > r.x - 1 &&
+        ry - 1 < r.y + r.h + 1 && ry + rh + 1 > r.y - 1
+      )) {
+        this.rooms.push({ x: rx, y: ry, w: rw, h: rh });
+      }
+    }
+
+    // Carve rooms
+    for (const r of this.rooms) {
+      for (let y = r.y; y < r.y + r.h; y++)
+        for (let x = r.x; x < r.x + r.w; x++)
+          this.map[y][x] = TILE.FLOOR;
+      // Walls around
+      for (let y = r.y - 1; y <= r.y + r.h; y++)
+        for (let x = r.x - 1; x <= r.x + r.w; x++)
+          if (this.map[y]?.[x] === TILE.VOID) this.map[y][x] = TILE.WALL;
+    }
+
+    // Connect rooms with corridors (nearest neighbor chain)
+    const connected = [0];
+    const unconnected = this.rooms.map((_, i) => i).slice(1);
+    while (unconnected.length) {
+      let bestD = Infinity, bestC = 0, bestU = 0;
+      for (const ci of connected) {
+        for (const ui of unconnected) {
+          const rc = this.rooms[ci], ru = this.rooms[ui];
+          const cx1 = rc.x + Math.floor(rc.w / 2), cy1 = rc.y + Math.floor(rc.h / 2);
+          const cx2 = ru.x + Math.floor(ru.w / 2), cy2 = ru.y + Math.floor(ru.h / 2);
+          const d = Math.abs(cx1 - cx2) + Math.abs(cy1 - cy2);
+          if (d < bestD) { bestD = d; bestC = ci; bestU = ui; }
+        }
+      }
+      this.carveCorridor(this.rooms[bestC], this.rooms[bestU]);
+      connected.push(bestU);
+      unconnected.splice(unconnected.indexOf(bestU), 1);
+    }
+
+    // Fill remaining VOID neighbors of corridors/floors with WALL
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < W; x++)
+        if (this.map[y][x] === TILE.CORRIDOR || this.map[y][x] === TILE.FLOOR)
+          for (let dy = -1; dy <= 1; dy++)
+            for (let dx = -1; dx <= 1; dx++)
+              if (this.map[y + dy]?.[x + dx] === TILE.VOID)
+                this.map[y + dy][x + dx] = TILE.WALL;
+
+    // Place player in first room
+    const startRoom = this.rooms[0];
+    this.player.x = startRoom.x + Math.floor(startRoom.w / 2);
+    this.player.y = startRoom.y + Math.floor(startRoom.h / 2);
+
+    // Place stairs in last room
+    const endRoom = this.rooms[this.rooms.length - 1];
+    const sx = endRoom.x + Math.floor(endRoom.w / 2);
+    const sy = endRoom.y + Math.floor(endRoom.h / 2);
+    this.map[sy][sx] = TILE.STAIRS;
+
+    // Scatter items
+    for (let i = 1; i < this.rooms.length - 1; i++) {
+      const r = this.rooms[i];
+      if (Math.random() < 0.5) {
+        const gx = r.x + Math.floor(Math.random() * r.w);
+        const gy = r.y + Math.floor(Math.random() * r.h);
+        this.items.push({ type: 'gold', x: gx, y: gy, amount: 2 + Math.floor(Math.random() * 4 * this.floor) });
+      }
+      if (Math.random() < 0.3) {
+        const px = r.x + Math.floor(Math.random() * r.w);
+        const py = r.y + Math.floor(Math.random() * r.h);
+        this.items.push({ type: 'potion', x: px, y: py, heal: 5 + this.floor * 2 });
+      }
+    }
+
+    // Spawn monsters
+    const eligible = MONSTERS.filter(m => m.minFloor <= this.floor);
+    const numMonsters = 4 + this.floor * 2;
+    for (let i = 0; i < numMonsters; i++) {
+      const room = this.rooms[1 + Math.floor(Math.random() * (this.rooms.length - 1))];
+      const mx = room.x + Math.floor(Math.random() * room.w);
+      const my = room.y + Math.floor(Math.random() * room.h);
+      if (mx === this.player.x && my === this.player.y) continue;
+      const template = eligible[Math.floor(Math.random() * eligible.length)];
+      const scale = 1 + (this.floor - template.minFloor) * 0.15;
+      this.monsters.push({
+        ...template,
+        x: mx, y: my,
+        hp: Math.ceil(template.hp * scale),
+        maxHp: Math.ceil(template.hp * scale),
+        atk: Math.ceil(template.atk * scale),
+      });
+    }
+
+    this.computeFOV();
+  }
+
+  carveCorridor(r1, r2) {
+    let x = r1.x + Math.floor(r1.w / 2);
+    let y = r1.y + Math.floor(r1.h / 2);
+    const tx = r2.x + Math.floor(r2.w / 2);
+    const ty = r2.y + Math.floor(r2.h / 2);
+
+    while (x !== tx) {
+      if (this.map[y][x] === TILE.VOID || this.map[y][x] === TILE.WALL)
+        this.map[y][x] = TILE.CORRIDOR;
+      x += x < tx ? 1 : -1;
+    }
+    while (y !== ty) {
+      if (this.map[y][x] === TILE.VOID || this.map[y][x] === TILE.WALL)
+        this.map[y][x] = TILE.CORRIDOR;
+      y += y < ty ? 1 : -1;
+    }
+  }
+
+  // === FOV (simple raycasting) ===
+  computeFOV() {
+    for (let y = 0; y < this.mapH; y++)
+      for (let x = 0; x < this.mapW; x++)
+        this.visible[y][x] = 0;
+
+    const px = this.player.x, py = this.player.y;
+    const R = this.viewRadius;
+    const steps = 120;
+
+    for (let i = 0; i < steps; i++) {
+      const angle = (i / steps) * Math.PI * 2;
+      const dx = Math.cos(angle), dy = Math.sin(angle);
+      let cx = px + 0.5, cy = py + 0.5;
+      for (let d = 0; d <= R; d += 0.5) {
+        const tx = Math.floor(cx), ty = Math.floor(cy);
+        if (tx < 0 || tx >= this.mapW || ty < 0 || ty >= this.mapH) break;
+        this.visible[ty][tx] = 1;
+        this.seen[ty][tx] = 1;
+        if (this.map[ty][tx] === TILE.WALL) break;
+        cx += dx * 0.5;
+        cy += dy * 0.5;
+      }
+    }
+  }
+
+  // === INPUT ===
+  setupInput() {
+    // D-pad buttons
+    document.querySelectorAll('.dpad-btn[data-dir]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const [dx, dy] = btn.dataset.dir.split(',').map(Number);
+        this.movePlayer(dx, dy);
+      });
+    });
+
+    // Swipe
+    let sx, sy;
+    const area = document.getElementById('map-area');
+    area.addEventListener('touchstart', e => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+    }, { passive: true });
+    area.addEventListener('touchend', e => {
+      const ex = e.changedTouches[0].clientX;
+      const ey = e.changedTouches[0].clientY;
+      const dx = ex - sx, dy = ey - sy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 20) return;
+      if (Math.abs(dx) > Math.abs(dy))
+        this.movePlayer(dx > 0 ? 1 : -1, 0);
+      else
+        this.movePlayer(0, dy > 0 ? 1 : -1);
+    }, { passive: true });
+
+    // Keyboard
+    document.addEventListener('keydown', e => {
+      const map = {
+        ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+        w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0],
+      };
+      if (map[e.key]) {
+        e.preventDefault();
+        this.movePlayer(...map[e.key]);
+      }
+      if (e.key === '.' || e.key === ' ') this.waitTurn();
+    });
+
+    document.getElementById('start-btn').addEventListener('click', () => {
+      document.getElementById('title-screen').remove();
+      this.start();
+    });
+  }
+
+  // === GAME LOGIC ===
+  movePlayer(dx, dy) {
+    if (!this.running) return;
+    const nx = this.player.x + dx;
+    const ny = this.player.y + dy;
+
+    if (nx < 0 || nx >= this.mapW || ny < 0 || ny >= this.mapH) return;
+    const tile = this.map[ny][nx];
+    if (tile === TILE.WALL || tile === TILE.VOID) return;
+
+    // Check monster
+    const mon = this.monsters.find(m => m.x === nx && m.y === ny && m.hp > 0);
+    if (mon) {
+      this.attack(this.player, mon);
+      this.turns++;
+      this.monsterTurns();
+      this.computeFOV();
+      this.render();
+      return;
+    }
+
+    this.player.x = nx;
+    this.player.y = ny;
+    this.turns++;
+
+    // Pick up items
+    const itemIdx = this.items.findIndex(it => it.x === nx && it.y === ny);
+    if (itemIdx >= 0) {
+      const item = this.items[itemIdx];
+      if (item.type === 'gold') {
+        this.player.gold += item.amount;
+        this.addLog(`Found ${item.amount} gold!`, 'loot');
+        this.flash('gold');
+      } else if (item.type === 'potion') {
+        const heal = Math.min(item.heal, this.player.maxHp - this.player.hp);
+        this.player.hp += heal;
+        this.addLog(`Drank a potion. +${heal} HP`, 'heal');
+        this.flash('heal');
+      }
+      this.items.splice(itemIdx, 1);
+    }
+
+    // Stairs
+    if (tile === TILE.STAIRS) {
+      this.floor++;
+      this.addLog(`Descended to floor ${this.floor}!`, 'descend');
+      this.flash('descend');
+      this.generateLevel();
+      this.render();
+      return;
+    }
+
+    this.monsterTurns();
+    this.computeFOV();
+    this.render();
+  }
+
+  waitTurn() {
+    if (!this.running) return;
+    this.turns++;
+    // Regen 1 HP occasionally
+    if (this.turns % 5 === 0 && this.player.hp < this.player.maxHp) {
+      this.player.hp++;
+    }
+    this.monsterTurns();
+    this.computeFOV();
+    this.render();
+  }
+
+  attack(attacker, defender) {
+    const isPlayer = attacker === this.player;
+    const dmg = Math.max(1, attacker.atk - (isPlayer ? 0 : this.player.def) + Math.floor(Math.random() * 2));
+
+    if (isPlayer) {
+      defender.hp -= dmg;
+      this.addLog(`You hit ${defender.name} for ${dmg} damage!`, 'combat');
+      if (defender.hp <= 0) {
+        this.addLog(`${defender.name} defeated! +${defender.xp} XP`, 'level');
+        this.player.xp += defender.xp;
+        this.player.kills++;
+        this.checkLevelUp();
+      }
+      this.flash('damage');
+    } else {
+      this.player.hp -= dmg;
+      this.addLog(`${attacker.name} hits you for ${dmg}!`, 'combat');
+      this.flash('damage');
+      if (this.player.hp <= 0) {
+        this.player.hp = 0;
+        this.running = false;
+        this.addLog('You have been slain...', 'death');
+        this.render();
+        setTimeout(() => this.showDeath(), 600);
+      }
+    }
+  }
+
+  checkLevelUp() {
+    while (this.player.xp >= this.player.xpNext) {
+      this.player.xp -= this.player.xpNext;
+      this.player.level++;
+      this.player.xpNext = Math.floor(this.player.xpNext * 1.6);
+      this.player.maxHp += 4;
+      this.player.hp = Math.min(this.player.hp + 4, this.player.maxHp);
+      this.player.atk += 1;
+      this.addLog(`LEVEL UP! Now level ${this.player.level}`, 'level');
+      // Show notification
+      const notif = document.createElement('div');
+      notif.className = 'levelup-notif';
+      notif.textContent = `LEVEL ${this.player.level}`;
+      document.getElementById('map-area').appendChild(notif);
+      setTimeout(() => notif.remove(), 1200);
+    }
+  }
+
+  monsterTurns() {
+    for (const m of this.monsters) {
+      if (m.hp <= 0) continue;
+      const dist = Math.abs(m.x - this.player.x) + Math.abs(m.y - this.player.y);
+      if (!this.visible[m.y]?.[m.x] && dist > 8) continue;
+
+      // Simple chase AI
+      if (dist <= 1) {
+        this.attack(m, this.player);
+        if (!this.running) return;
+      } else if (dist <= 8) {
+        let bestDx = 0, bestDy = 0, bestD = dist;
+        for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+          const nx = m.x + dx, ny = m.y + dy;
+          if (nx < 0 || nx >= this.mapW || ny < 0 || ny >= this.mapH) continue;
+          const t = this.map[ny][nx];
+          if (t === TILE.WALL || t === TILE.VOID) continue;
+          if (this.monsters.some(o => o !== m && o.hp > 0 && o.x === nx && o.y === ny)) continue;
+          const nd = Math.abs(nx - this.player.x) + Math.abs(ny - this.player.y);
+          if (nd < bestD) { bestD = nd; bestDx = dx; bestDy = dy; }
+        }
+        if (bestDx || bestDy) {
+          m.x += bestDx;
+          m.y += bestDy;
+        }
+      }
+    }
+  }
+
+  // === RENDERING ===
+  render() {
+    const area = document.getElementById('map-area');
+    const areaW = area.clientWidth;
+    const areaH = area.clientHeight;
+
+    // Calculate tile size to fit ~15 tiles across
+    const ts = Math.max(16, Math.min(32, Math.floor(areaW / 15)));
+    this.tileSize = ts;
+
+    const viewTilesX = Math.floor(areaW / ts);
+    const viewTilesY = Math.floor(areaH / ts);
+    const canvasW = viewTilesX * ts;
+    const canvasH = viewTilesY * ts;
+
+    this.canvas.width = canvasW;
+    this.canvas.height = canvasH;
+    this.canvas.style.width = canvasW + 'px';
+    this.canvas.style.height = canvasH + 'px';
+
+    const ctx = this.ctx;
+    ctx.fillStyle = '#05050a';
+    ctx.fillRect(0, 0, canvasW, canvasH);
+
+    const px = this.player.x, py = this.player.y;
+    const offX = Math.floor(viewTilesX / 2);
+    const offY = Math.floor(viewTilesY / 2);
+    const startX = px - offX;
+    const startY = py - offY;
+
+    // Draw tiles
+    for (let vy = 0; vy < viewTilesY; vy++) {
+      for (let vx = 0; vx < viewTilesX; vx++) {
+        const mx = startX + vx;
+        const my = startY + vy;
+        const sx = vx * ts, sy = vy * ts;
+
+        if (mx < 0 || mx >= this.mapW || my < 0 || my >= this.mapH) continue;
+
+        const vis = this.visible[my][mx];
+        const seen = this.seen[my][mx];
+        if (!vis && !seen) continue;
+
+        const tile = this.map[my][mx];
+        const alpha = vis ? 1 : 0.25;
+
+        // Tile colors
+        if (tile === TILE.WALL) {
+          ctx.fillStyle = vis ? '#2a2a3a' : '#15151f';
+          ctx.fillRect(sx, sy, ts, ts);
+          // Subtle top edge highlight
+          if (vis) {
+            ctx.fillStyle = '#ffffff08';
+            ctx.fillRect(sx, sy, ts, 1);
+          }
+        } else if (tile === TILE.FLOOR || tile === TILE.CORRIDOR) {
+          const checker = (mx + my) % 2 === 0;
+          ctx.fillStyle = vis
+            ? (checker ? '#161626' : '#181830')
+            : (checker ? '#0c0c14' : '#0d0d16');
+          ctx.fillRect(sx, sy, ts, ts);
+          // Dot pattern
+          if (vis) {
+            ctx.fillStyle = '#ffffff06';
+            ctx.fillRect(sx + ts / 2 - 1, sy + ts / 2 - 1, 2, 2);
+          }
+        } else if (tile === TILE.STAIRS) {
+          ctx.fillStyle = vis ? '#181830' : '#0d0d16';
+          ctx.fillRect(sx, sy, ts, ts);
+          if (vis || seen) {
+            ctx.fillStyle = vis ? '#f0c040' : '#504010';
+            ctx.font = `bold ${ts - 4}px JetBrains Mono`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('▼', sx + ts / 2, sy + ts / 2 + 1);
+          }
+        }
+      }
+    }
+
+    // Draw items
+    for (const item of this.items) {
+      const vx = item.x - startX, vy = item.y - startY;
+      if (vx < 0 || vx >= viewTilesX || vy < 0 || vy >= viewTilesY) continue;
+      if (!this.visible[item.y][item.x]) continue;
+      const sx = vx * ts, sy = vy * ts;
+      ctx.font = `bold ${ts - 4}px JetBrains Mono`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      if (item.type === 'gold') {
+        ctx.fillStyle = '#f0c040';
+        ctx.fillText('$', sx + ts / 2, sy + ts / 2 + 1);
+      } else {
+        ctx.fillStyle = '#40e080';
+        ctx.fillText('♥', sx + ts / 2, sy + ts / 2 + 1);
+      }
+    }
+
+    // Draw monsters
+    for (const m of this.monsters) {
+      if (m.hp <= 0) continue;
+      const vx = m.x - startX, vy = m.y - startY;
+      if (vx < 0 || vx >= viewTilesX || vy < 0 || vy >= viewTilesY) continue;
+      if (!this.visible[m.y][m.x]) continue;
+      const sx = vx * ts, sy = vy * ts;
+
+      // Monster HP bar
+      const hpPct = m.hp / m.maxHp;
+      ctx.fillStyle = '#40101080';
+      ctx.fillRect(sx + 2, sy, ts - 4, 3);
+      ctx.fillStyle = hpPct > 0.5 ? '#40c040' : hpPct > 0.25 ? '#e0c040' : '#e04040';
+      ctx.fillRect(sx + 2, sy, (ts - 4) * hpPct, 3);
+
+      ctx.fillStyle = m.color;
+      ctx.font = `bold ${ts - 2}px JetBrains Mono`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(m.ch, sx + ts / 2, sy + ts / 2 + 2);
+    }
+
+    // Draw player
+    const pvx = offX, pvy = offY;
+    const psx = pvx * ts, psy = pvy * ts;
+    // Glow
+    ctx.shadowColor = '#f0c040';
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = '#f0e080';
+    ctx.font = `bold ${ts}px JetBrains Mono`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('@', psx + ts / 2, psy + ts / 2 + 1);
+    ctx.shadowBlur = 0;
+
+    // FOV vignette
+    const grad = ctx.createRadialGradient(
+      psx + ts / 2, psy + ts / 2, ts * 3,
+      psx + ts / 2, psy + ts / 2, ts * (this.viewRadius + 2)
+    );
+    grad.addColorStop(0, 'transparent');
+    grad.addColorStop(1, '#05050af0');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvasW, canvasH);
+
+    this.updateHUD();
+  }
+
+  updateHUD() {
+    const p = this.player;
+    document.getElementById('hud-floor').textContent = this.floor;
+    document.getElementById('hud-gold').textContent = p.gold;
+    document.getElementById('hud-atk').textContent = p.atk;
+
+    const hpPct = Math.max(0, (p.hp / p.maxHp) * 100);
+    document.getElementById('hp-fill').style.width = hpPct + '%';
+    document.getElementById('hp-text').textContent = `${p.hp}/${p.maxHp}`;
+
+    const xpPct = (p.xp / p.xpNext) * 100;
+    document.getElementById('xp-fill').style.width = xpPct + '%';
+    document.getElementById('xp-text').textContent = `Lv ${p.level} — ${p.xp}/${p.xpNext}`;
+  }
+
+  addLog(msg, cls = '') {
+    const div = document.createElement('div');
+    div.className = 'log-line ' + cls;
+    div.textContent = msg;
+    this.log.appendChild(div);
+    this.log.scrollTop = this.log.scrollHeight;
+    // Keep last 50 lines
+    while (this.log.children.length > 50) this.log.firstChild.remove();
+  }
+
+  flash(type) {
+    const el = document.createElement('div');
+    el.className = `flash flash-${type}`;
+    document.getElementById('map-area').appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+
+  showDeath() {
+    const p = this.player;
+    const el = document.createElement('div');
+    el.className = 'overlay death-overlay';
+    el.innerHTML = `
+      <h1>FALLEN</h1>
+      <h2>ON FLOOR ${this.floor}</h2>
+      <div class="stats-grid">
+        <span class="label">Level</span><span class="value">${p.level}</span>
+        <span class="label">Kills</span><span class="value">${p.kills}</span>
+        <span class="label">Gold</span><span class="value">${p.gold}</span>
+        <span class="label">Turns</span><span class="value">${this.turns}</span>
+        <span class="label">Deepest</span><span class="value">Floor ${this.floor}</span>
+        <span class="label">Attack</span><span class="value">${p.atk}</span>
+      </div>
+      <button class="play-btn" onclick="this.parentElement.remove(); game.start();">DESCEND AGAIN</button>
+    `;
+    document.getElementById('game-container').appendChild(el);
+  }
+}
+
+// Boot
+const game = new Game();
+window.addEventListener('resize', () => { if (game.running) game.render(); });
+</script>
+</body>
+</html>
