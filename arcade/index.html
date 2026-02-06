@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Arcade - Games by btgprojects">
+    <title>The Arcade - btgprojects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            /* Catppuccin Macchiato Palette */
+            --bg: #24273a;
+            --bg-alt: #1e2030;
+            --fg: #cad3f5;
+            --primary: #8aadf4; /* Blue */
+            --secondary: #f5bde6; /* Pink */
+            --highlight: #a6da95; /* Green */
+            --peach: #f5a97f; /* Peach */
+            --yellow: #eed49f; /* Yellow */
+            --red: #ed8796; /* Vibrant red */
+            --teal: #8bd5ca; /* Teal */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .skip-link {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .skip-link:focus {
+            left: 0;
+            width: auto;
+            height: auto;
+            padding: 1rem;
+            background: var(--highlight);
+            color: var(--bg);
+            z-index: 1000;
+        }
+
+        .header {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover,
+        .back-link:focus {
+            color: var(--highlight);
+        }
+
+        .arcade-header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .arcade-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .arcade-header p {
+            font-size: 1.1rem;
+            color: var(--fg);
+            opacity: 0.9;
+        }
+
+        .games {
+            padding: 2rem 2rem 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .game-item {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .game-item:hover,
+        .game-item:focus-within {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-item i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-item .bastion-icon {
+            color: var(--peach);
+        }
+
+        .game-item .descent-icon {
+            color: var(--red);
+        }
+
+        .game-item .voidpulse-icon {
+            color: var(--secondary);
+        }
+
+        .game-item .escctrl-icon {
+            color: var(--primary);
+        }
+
+        .game-item h3 {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .game-item p {
+            font-size: 1rem;
+            margin: 0.5rem 0 1rem;
+        }
+
+        .game-link {
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 700;
+            color: var(--bg);
+            display: inline-block;
+        }
+
+        .game-link.bastion {
+            background-color: var(--peach);
+        }
+
+        .game-link.bastion:hover,
+        .game-link.bastion:focus {
+            background-color: var(--yellow);
+        }
+
+        .game-link.descent {
+            background-color: var(--red);
+        }
+
+        .game-link.descent:hover,
+        .game-link.descent:focus {
+            background-color: var(--peach);
+        }
+
+        .game-link.voidpulse {
+            background-color: var(--secondary);
+        }
+
+        .game-link.voidpulse:hover,
+        .game-link.voidpulse:focus {
+            background-color: var(--teal);
+        }
+
+        .game-link.escctrl {
+            background-color: var(--primary);
+        }
+
+        .game-link.escctrl:hover,
+        .game-link.escctrl:focus {
+            background-color: var(--highlight);
+        }
+
+        .game-link:focus-visible {
+            outline: 3px solid var(--highlight);
+            outline-offset: 2px;
+        }
+
+        .footer {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: auto;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover,
+        .footer a:focus {
+            color: var(--highlight);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .arcade-header {
+                padding: 2rem 1rem 1rem;
+            }
+
+            .arcade-header h1 {
+                font-size: 2rem;
+            }
+
+            .games {
+                padding: 1rem 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="header">
+        <nav class="nav" aria-label="Main navigation">
+            <a href="/" class="logo">btgprojects</a>
+            <a href="/" class="back-link">← Back to Home</a>
+        </nav>
+    </header>
+
+    <div class="arcade-header">
+        <h1>🕹️ The Arcade</h1>
+        <p>A collection of games crafted with code and creativity</p>
+    </div>
+
+    <main id="main-content" class="games">
+        <div class="game-list">
+            <article class="game-item">
+                <i class="fas fa-chess-rook game-icon bastion-icon" aria-hidden="true"></i>
+                <h3>Bastion TD</h3>
+                <p>A tower defense game where strategy meets action.</p>
+                <a href="/game/bastiontd/bastiontd.html" target="_blank" class="game-link bastion" aria-label="Play Bastion TD">Play Now</a>
+            </article>
+            <article class="game-item">
+                <i class="fas fa-arrow-down game-icon descent-icon" aria-hidden="true"></i>
+                <h3>Descent</h3>
+                <p>Navigate the depths in this challenging adventure.</p>
+                <a href="/game/descent/descent.html" target="_blank" class="game-link descent" aria-label="Play Descent">Play Now</a>
+            </article>
+            <article class="game-item">
+                <i class="fas fa-satellite-dish game-icon voidpulse-icon" aria-hidden="true"></i>
+                <h3>Void Pulse</h3>
+                <p>A pulse-pounding space experience.</p>
+                <a href="/game/voidpulse/voidpulse.html" target="_blank" class="game-link voidpulse" aria-label="Play Void Pulse">Play Now</a>
+            </article>
+            <article class="game-item">
+                <i class="fas fa-terminal game-icon escctrl-icon" aria-hidden="true"></i>
+                <h3>EscCTRL</h3>
+                <p>A terminal-based puzzle game.</p>
+                <a href="/game/escctrl/index.html" target="_blank" class="game-link escctrl" aria-label="Play EscCTRL">Play Now</a>
+            </article>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2024 btgprojects. Original content by btgprojects. Additional content and help from <a href="/acknowledgements/index.html" target="_blank">others</a></p>
+        <p>Feel free to reach out via <a href="mailto:contact.btgprojects@gmail.com">email</a> or check out my <a href="https://github.com/bgrimes-me" target="_blank">GitHub</a>.</p>
+    </footer>
+
+</body>
+</html>
