@@ -113,16 +113,12 @@
             margin-bottom: 1rem;
         }
 
-        .project-item .ai-icon {
-            color: var(--peach);
+        .project-item .arcade-icon {
+            color: var(--primary);
         }
 
         .project-item .more-icon {
             color: var(--teal);
-        }
-
-        .project-item .terminal-icon {
-            color: var(--primary);
         }
 
         .project-item h3 {
@@ -144,13 +140,13 @@
             display: inline-block;
         }
 
-        .project-link.ai-chat {
-            background-color: var(--peach);
+        .project-link.arcade {
+            background-color: var(--primary);
         }
 
-        .project-link.ai-chat:hover,
-        .project-link.ai-chat:focus {
-            background-color: var(--yellow);
+        .project-link.arcade:hover,
+        .project-link.arcade:focus {
+            background-color: var(--highlight);
         }
 
         .project-link.more-to-come {
@@ -160,15 +156,6 @@
         .project-link.more-to-come:hover,
         .project-link.more-to-come:focus {
             background-color: var(--secondary);
-        }
-
-        .project-link.encryption-game {
-            background-color: var(--primary);
-        }
-
-        .project-link.encryption-game:hover,
-        .project-link.encryption-game:focus {
-            background-color: var(--highlight);
         }
 
         .project-link:focus-visible {
@@ -224,16 +211,10 @@
     <main id="main-content" class="projects">
         <div class="project-list">
             <article class="project-item">
-                <i class="fas fa-robot project-icon ai-icon" aria-hidden="true"></i>
-                <h3>AI Chat Interface</h3>
-                <p>Powered by Ollama and Open-webUI</p>
-                <a href="https://open-webui.btgprojects.dev/auth" target="_blank" class="project-link ai-chat" aria-label="Explore the AI Chat Interface">Explore</a>
-            </article>
-            <article class="project-item">
-                <i class="fas fa-terminal project-icon terminal-icon" aria-hidden="true"></i>
-                <h3>EscCTRL (Preview)</h3>
-                <p>A terminal-based puzzle game.</p>
-                <a href="/game/index.html" target="_blank" class="project-link encryption-game" aria-label="Play EscCTRL preview">Play Now</a>
+                <i class="fas fa-gamepad project-icon arcade-icon" aria-hidden="true"></i>
+                <h3>The Arcade</h3>
+                <p>Play our collection of browser-based games.</p>
+                <a href="/arcade/index.html" class="project-link arcade" aria-label="Visit The Arcade">Play Games</a>
             </article>
             <article class="project-item">
                 <i class="fas fa-wrench project-icon more-icon" aria-hidden="true"></i>
