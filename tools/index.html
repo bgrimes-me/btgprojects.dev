@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Developer Tools - Useful web tools by btgprojects">
+    <title>Developer Tools - btgprojects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            /* Catppuccin Macchiato Palette */
+            --bg: #24273a;
+            --bg-alt: #1e2030;
+            --fg: #cad3f5;
+            --primary: #8aadf4;
+            --secondary: #f5bde6;
+            --highlight: #a6da95;
+            --peach: #f5a97f;
+            --yellow: #eed49f;
+            --red: #ed8796;
+            --teal: #8bd5ca;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover,
+        .back-link:focus {
+            color: var(--highlight);
+        }
+
+        .tools-header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tools-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tools-header p {
+            font-size: 1.1rem;
+            color: var(--fg);
+            opacity: 0.9;
+        }
+
+        .tools {
+            padding: 2rem 2rem 3rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tool-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .tool-item {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .tool-item:hover,
+        .tool-item:focus-within {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .tool-item i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-item .regex-icon {
+            color: var(--primary);
+        }
+
+        .tool-item .diff-icon {
+            color: var(--secondary);
+        }
+
+        .tool-item .qr-icon {
+            color: var(--highlight);
+        }
+
+        .tool-item .ascii-icon {
+            color: var(--peach);
+        }
+
+        .tool-item .color-converter-icon {
+            color: var(--yellow);
+        }
+
+        .tool-item .color-palette-icon {
+            color: var(--teal);
+        }
+
+        .tool-item h3 {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .tool-item p {
+            font-size: 1rem;
+            margin: 0.5rem 0 1rem;
+        }
+
+        .tool-link {
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 700;
+            color: var(--bg);
+            display: inline-block;
+        }
+
+        .tool-link.regex {
+            background-color: var(--primary);
+        }
+
+        .tool-link.regex:hover,
+        .tool-link.regex:focus {
+            background-color: var(--highlight);
+        }
+
+        .tool-link.diff {
+            background-color: var(--secondary);
+        }
+
+        .tool-link.diff:hover,
+        .tool-link.diff:focus {
+            background-color: var(--teal);
+        }
+
+        .tool-link.qr {
+            background-color: var(--highlight);
+        }
+
+        .tool-link.qr:hover,
+        .tool-link.qr:focus {
+            background-color: var(--teal);
+        }
+
+        .tool-link.ascii {
+            background-color: var(--peach);
+        }
+
+        .tool-link.ascii:hover,
+        .tool-link.ascii:focus {
+            background-color: var(--yellow);
+        }
+
+        .tool-link.color-converter {
+            background-color: var(--yellow);
+        }
+
+        .tool-link.color-converter:hover,
+        .tool-link.color-converter:focus {
+            background-color: var(--peach);
+        }
+
+        .tool-link.color-palette {
+            background-color: var(--teal);
+        }
+
+        .tool-link.color-palette:hover,
+        .tool-link.color-palette:focus {
+            background-color: var(--secondary);
+        }
+
+        .tool-link:focus-visible {
+            outline: 3px solid var(--highlight);
+            outline-offset: 2px;
+        }
+
+        .footer {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: auto;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover,
+        .footer a:focus {
+            color: var(--highlight);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tools-header {
+                padding: 2rem 1rem 1rem;
+            }
+
+            .tools-header h1 {
+                font-size: 2rem;
+            }
+
+            .tools {
+                padding: 1rem 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav" aria-label="Main navigation">
+            <a href="/" class="logo">btgprojects</a>
+            <a href="/" class="back-link">← Back to Home</a>
+        </nav>
+    </header>
+
+    <div class="tools-header">
+        <h1>🛠️ Developer Tools</h1>
+        <p>Free, open-source web tools for developers and creators</p>
+    </div>
+
+    <main class="tools">
+        <div class="tool-list">
+            <article class="tool-item">
+                <i class="fas fa-code tool-icon regex-icon" aria-hidden="true"></i>
+                <h3>Regex Builder</h3>
+                <p>Build regular expressions visually without the pain.</p>
+                <a href="/tools/regexbuilder/regexbuilder.html" class="tool-link regex" aria-label="Open Regex Builder">Open Tool</a>
+            </article>
+
+            <article class="tool-item">
+                <i class="fas fa-not-equal tool-icon diff-icon" aria-hidden="true"></i>
+                <h3>Diff Checker</h3>
+                <p>Compare text differences side-by-side or inline.</p>
+                <a href="/tools/diffchecker/diffchecker.html" class="tool-link diff" aria-label="Open Diff Checker">Open Tool</a>
+            </article>
+
+            <article class="tool-item">
+                <i class="fas fa-qrcode tool-icon qr-icon" aria-hidden="true"></i>
+                <h3>QR Code Generator</h3>
+                <p>Create customizable QR codes with error correction.</p>
+                <a href="/tools/qrcodegen/qrcodegen.html" class="tool-link qr" aria-label="Open QR Code Generator">Open Tool</a>
+            </article>
+
+            <article class="tool-item">
+                <i class="fas fa-image tool-icon ascii-icon" aria-hidden="true"></i>
+                <h3>ASCII Art Generator</h3>
+                <p>Transform images into stunning ASCII art.</p>
+                <a href="/tools/asciiartgen/asciiartgen.html" class="tool-link ascii" aria-label="Open ASCII Art Generator">Open Tool</a>
+            </article>
+
+            <article class="tool-item">
+                <i class="fas fa-exchange-alt tool-icon color-converter-icon" aria-hidden="true"></i>
+                <h3>Color Converter</h3>
+                <p>Convert between HEX, RGB, HSL, HSV, and CMYK.</p>
+                <a href="/tools/colorconverter/colorconverter.html" class="tool-link color-converter" aria-label="Open Color Converter">Open Tool</a>
+            </article>
+
+            <article class="tool-item">
+                <i class="fas fa-palette tool-icon color-palette-icon" aria-hidden="true"></i>
+                <h3>Color Palette Generator</h3>
+                <p>Create harmonious color schemes with color theory.</p>
+                <a href="/tools/colorpalette/colorpalette.html" class="tool-link color-palette" aria-label="Open Color Palette Generator">Open Tool</a>
+            </article>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2024 btgprojects. Original content by btgprojects. Additional content and help from <a href="/acknowledgements/index.html" target="_blank">others</a></p>
+        <p>Feel free to reach out via <a href="mailto:contact.btgprojects@gmail.com">email</a> or check out my <a href="https://github.com/bgrimes-me" target="_blank">GitHub</a>.</p>
+    </footer>
+</body>
+</html>
