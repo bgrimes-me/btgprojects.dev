@@ -117,6 +117,10 @@
             color: var(--primary);
         }
 
+        .project-item .tools-icon {
+            color: var(--peach);
+        }
+
         .project-item .more-icon {
             color: var(--teal);
         }
@@ -147,6 +151,15 @@
         .project-link.arcade:hover,
         .project-link.arcade:focus {
             background-color: var(--highlight);
+        }
+
+        .project-link.tools {
+            background-color: var(--peach);
+        }
+
+        .project-link.tools:hover,
+        .project-link.tools:focus {
+            background-color: var(--yellow);
         }
 
         .project-link.more-to-come {
@@ -215,6 +228,12 @@
                 <h3>The Arcade</h3>
                 <p>Play our collection of browser-based games.</p>
                 <a href="/arcade/index.html" class="project-link arcade" aria-label="Visit The Arcade">Play Games</a>
+            </article>
+            <article class="project-item">
+                <i class="fas fa-tools project-icon tools-icon" aria-hidden="true"></i>
+                <h3>Developer Tools</h3>
+                <p>Useful web tools for developers and creators.</p>
+                <a href="/tools/index.html" class="project-link tools" aria-label="Browse Developer Tools">Browse Tools</a>
             </article>
             <article class="project-item">
                 <i class="fas fa-wrench project-icon more-icon" aria-hidden="true"></i>
