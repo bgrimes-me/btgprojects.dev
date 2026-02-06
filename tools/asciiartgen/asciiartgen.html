@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Image to ASCII Art Converter - Transform images into text art">
+    <title>ASCII Art Generator - btgprojects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            /* Catppuccin Macchiato Palette */
+            --bg: #24273a;
+            --bg-alt: #1e2030;
+            --fg: #cad3f5;
+            --primary: #8aadf4;
+            --secondary: #f5bde6;
+            --highlight: #a6da95;
+            --peach: #f5a97f;
+            --yellow: #eed49f;
+            --red: #ed8796;
+            --teal: #8bd5ca;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover,
+        .back-link:focus {
+            color: var(--highlight);
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .tool-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .upload-section {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--primary);
+            border-radius: 10px;
+            padding: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg);
+        }
+
+        .upload-area:hover {
+            border-color: var(--highlight);
+            background: var(--bg-alt);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--highlight);
+            background: var(--bg-alt);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: var(--fg);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: var(--fg);
+            opacity: 0.7;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-section {
+            display: none;
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .controls-section {
+            display: none;
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-weight: 700;
+            color: var(--fg);
+            font-size: 0.9rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 40px;
+            background: var(--bg);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        select {
+            padding: 0.5rem;
+            background: var(--bg);
+            color: var(--fg);
+            border: 2px solid var(--bg);
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .range-value {
+            color: var(--secondary);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-weight: 400;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--bg);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--highlight);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--bg);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--teal);
+        }
+
+        .btn-success {
+            background-color: var(--highlight);
+            color: var(--bg);
+        }
+
+        .btn-success:hover {
+            background-color: var(--teal);
+        }
+
+        .output-section {
+            display: none;
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .output-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .ascii-output {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .ascii-art {
+            font-family: 'Courier New', monospace;
+            line-height: 1;
+            white-space: pre;
+            color: var(--fg);
+            font-size: 8px;
+            letter-spacing: 0;
+        }
+
+        .ascii-art.colored {
+            font-size: 6px;
+        }
+
+        .footer {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: auto;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover {
+            color: var(--highlight);
+        }
+
+        .processing {
+            text-align: center;
+            padding: 2rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .processing i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .tool-header h1 {
+                font-size: 2rem;
+            }
+
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ascii-art {
+                font-size: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">btgprojects</a>
+            <a href="/" class="back-link">← Back to Home</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="tool-header">
+            <h1>🖼️ ASCII Art Generator</h1>
+            <p>Transform images into stunning ASCII art</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <div class="upload-text">Click to upload or drag and drop</div>
+                <div class="upload-hint">Supports JPG, PNG, GIF, WebP</div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <h3>Original Image</h3>
+            <img id="previewImage" class="preview-image" alt="Preview">
+        </div>
+
+        <div class="controls-section" id="controlsSection">
+            <h3>Settings</h3>
+            <div class="control-grid">
+                <div class="control-group">
+                    <label for="widthSlider">Width (characters): <span class="range-value" id="widthValue">100</span></label>
+                    <input type="range" id="widthSlider" min="40" max="200" value="100" oninput="updateValue('width')">
+                </div>
+
+                <div class="control-group">
+                    <label for="charSet">Character Set:</label>
+                    <select id="charSet" onchange="generateAscii()">
+                        <option value="simple">Simple ( .:-=+*#%@)</option>
+                        <option value="standard" selected>Standard ( .'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$)</option>
+                        <option value="detailed">Detailed (Full ASCII range)</option>
+                        <option value="blocks">Block Elements (█▓▒░)</option>
+                        <option value="binary">Binary (01)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="invertToggle">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="invertToggle" onchange="generateAscii()">
+                            <span>Invert (light background)</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <label for="colorToggle">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="colorToggle" onchange="generateAscii()">
+                            <span>Colored ASCII (slower)</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="generateAscii()">
+                    <i class="fas fa-magic"></i> Generate ASCII Art
+                </button>
+                <button class="btn-secondary" onclick="resetTool()">
+                    <i class="fas fa-redo"></i> Start Over
+                </button>
+            </div>
+        </div>
+
+        <div class="output-section" id="outputSection">
+            <h3>ASCII Art Output</h3>
+            <div class="ascii-output" id="asciiOutput">
+                <div class="processing">
+                    <i class="fas fa-spinner"></i>
+                    <div>Generating ASCII art...</div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-success" onclick="copyAscii()">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <button class="btn-secondary" onclick="downloadAscii()">
+                    <i class="fas fa-download"></i> Download as TXT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 btgprojects. Original content by btgprojects.</p>
+        <p>Feel free to reach out via <a href="mailto:contact.btgprojects@gmail.com">email</a> or check out my <a href="https://github.com/bgrimes-me" target="_blank">GitHub</a>.</p>
+    </footer>
+
+    <script>
+        let currentImage = null;
+        let asciiText = '';
+
+        const charSets = {
+            simple: ' .:-=+*#%@',
+            standard: ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$',
+            detailed: ' .",:;!~+-xmo*#W&8@',
+            blocks: ' ░▒▓█',
+            binary: '01'
+        };
+
+        // File input handling
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    currentImage = img;
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('previewSection').style.display = 'block';
+                    document.getElementById('controlsSection').style.display = 'block';
+                    generateAscii();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateValue(type) {
+            const value = document.getElementById(type + 'Slider').value;
+            document.getElementById(type + 'Value').textContent = value;
+            generateAscii();
+        }
+
+        function generateAscii() {
+            if (!currentImage) return;
+
+            document.getElementById('outputSection').style.display = 'block';
+            document.getElementById('asciiOutput').innerHTML = '<div class="processing"><i class="fas fa-spinner"></i><div>Generating ASCII art...</div></div>';
+
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                const width = parseInt(document.getElementById('widthSlider').value);
+                const charSetType = document.getElementById('charSet').value;
+                const invert = document.getElementById('invertToggle').checked;
+                const colored = document.getElementById('colorToggle').checked;
+                const chars = charSets[charSetType];
+
+                const ascii = imageToAscii(currentImage, width, chars, invert, colored);
+                displayAscii(ascii, colored);
+            }, 100);
+        }
+
+        function imageToAscii(img, maxWidth, chars, invert, colored) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Calculate dimensions
+            const aspectRatio = img.height / img.width;
+            const width = maxWidth;
+            const height = Math.floor(width * aspectRatio * 0.5); // 0.5 to account for character height
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // Draw image to canvas
+            ctx.drawImage(img, 0, 0, width, height);
+            const imageData = ctx.getImageData(0, 0, width, height);
+
+            let ascii = '';
+            if (colored) {
+                ascii = '<div class="ascii-art colored">';
+            }
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const offset = (y * width + x) * 4;
+                    const r = imageData.data[offset];
+                    const g = imageData.data[offset + 1];
+                    const b = imageData.data[offset + 2];
+
+                    // Convert to grayscale
+                    const brightness = (r + g + b) / 3;
+                    
+                    // Map brightness to character
+                    let charIndex = Math.floor((brightness / 255) * (chars.length - 1));
+                    if (invert) {
+                        charIndex = chars.length - 1 - charIndex;
+                    }
+                    
+                    let char = chars[charIndex] || ' ';
+                    
+                    // Escape HTML special characters
+                    const escapeHtml = (str) => {
+                        const map = {
+                            '&': '&amp;',
+                            '<': '&lt;',
+                            '>': '&gt;',
+                            '"': '&quot;',
+                            "'": '&#039;'
+                        };
+                        return str.replace(/[&<>"']/g, (m) => map[m]);
+                    };
+
+                    if (colored) {
+                        ascii += `<span style="color: rgb(${r},${g},${b})">${escapeHtml(char)}</span>`;
+                    } else {
+                        ascii += escapeHtml(char);
+                    }
+                }
+                ascii += '\n';
+            }
+
+            if (colored) {
+                ascii += '</div>';
+            }
+
+            return ascii;
+        }
+
+        function displayAscii(ascii, colored) {
+            const output = document.getElementById('asciiOutput');
+            
+            if (colored) {
+                output.innerHTML = ascii;
+                // Store plain text version for copying
+                const temp = document.createElement('div');
+                temp.innerHTML = ascii;
+                asciiText = temp.textContent;
+            } else {
+                output.innerHTML = `<pre class="ascii-art">${ascii}</pre>`;
+                asciiText = ascii;
+            }
+        }
+
+        function copyAscii() {
+            navigator.clipboard.writeText(asciiText).then(() => {
+                alert('ASCII art copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function downloadAscii() {
+            const blob = new Blob([asciiText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ascii-art.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetTool() {
+            currentImage = null;
+            asciiText = '';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('controlsSection').style.display = 'none';
+            document.getElementById('outputSection').style.display = 'none';
+            document.getElementById('widthSlider').value = 100;
+            document.getElementById('widthValue').textContent = '100';
+            document.getElementById('charSet').value = 'standard';
+            document.getElementById('invertToggle').checked = false;
+            document.getElementById('colorToggle').checked = false;
+        }
+    </script>
+</body>
+</html>
