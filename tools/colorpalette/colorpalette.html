@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Color Palette Generator - Create harmonious color schemes">
+    <title>Color Palette Generator - btgprojects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            /* Catppuccin Macchiato Palette */
+            --bg: #24273a;
+            --bg-alt: #1e2030;
+            --fg: #cad3f5;
+            --primary: #8aadf4;
+            --secondary: #f5bde6;
+            --highlight: #a6da95;
+            --peach: #f5a97f;
+            --yellow: #eed49f;
+            --red: #ed8796;
+            --teal: #8bd5ca;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover,
+        .back-link:focus {
+            color: var(--highlight);
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .tool-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: none;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.5rem;
+            border: 2px solid var(--bg);
+            border-radius: 5px;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Inter', monospace;
+            font-size: 1rem;
+        }
+
+        select {
+            flex: 1;
+            padding: 0.5rem;
+            border: 2px solid var(--bg);
+            border-radius: 5px;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--highlight);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--bg);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--teal);
+        }
+
+        .palette-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .color-card {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .color-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .color-swatch {
+            height: 150px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s ease;
+        }
+
+        .lock-icon:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .lock-icon.locked {
+            background: var(--yellow);
+            color: var(--bg);
+        }
+
+        .reroll-icon {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .reroll-icon:hover {
+            background: var(--primary);
+            transform: rotate(180deg);
+        }
+
+        .color-info {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .color-hex {
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            user-select: all;
+        }
+
+        .color-rgb {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            font-family: monospace;
+        }
+
+        .copy-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--highlight);
+            color: var(--bg);
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .copy-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .footer {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: auto;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover {
+            color: var(--highlight);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .tool-header h1 {
+                font-size: 2rem;
+            }
+
+            .palette-display {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .color-swatch {
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">btgprojects</a>
+            <a href="/" class="back-link">← Back to Home</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="tool-header">
+            <h1>🎨 Color Palette Generator</h1>
+            <p>Create harmonious color schemes based on color theory</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="baseColor">Base Color</label>
+                <div class="input-row">
+                    <input type="color" id="baseColor" value="#8aadf4">
+                    <input type="text" id="baseColorHex" value="#8aadf4" maxlength="7">
+                    <button class="btn-secondary" onclick="randomizeBase()">
+                        <i class="fas fa-dice"></i> Random
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="harmonyType">Color Harmony</label>
+                <select id="harmonyType" onchange="generatePalette()">
+                    <option value="complementary">Complementary</option>
+                    <option value="analogous">Analogous</option>
+                    <option value="triadic">Triadic</option>
+                    <option value="split-complementary">Split Complementary</option>
+                    <option value="tetradic">Tetradic (Square)</option>
+                    <option value="monochromatic">Monochromatic</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="generatePalette()">
+                    <i class="fas fa-sync-alt"></i> Generate Palette
+                </button>
+                <button class="btn-secondary" onclick="exportPalette()">
+                    <i class="fas fa-download"></i> Export as JSON
+                </button>
+            </div>
+        </div>
+
+        <div class="palette-display" id="paletteDisplay"></div>
+    </div>
+
+    <div class="copy-notification" id="copyNotification">
+        Copied to clipboard!
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 btgprojects. Original content by btgprojects.</p>
+        <p>Feel free to reach out via <a href="mailto:contact.btgprojects@gmail.com">email</a> or check out my <a href="https://github.com/bgrimes-me" target="_blank">GitHub</a>.</p>
+    </footer>
+
+    <script>
+        let currentPalette = [];
+        let lockedColors = new Set();
+
+        // Convert hex to HSL
+        function hexToHSL(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+            let max = Math.max(r, g, b);
+            let min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                let d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+
+            return { h: h * 360, s: s * 100, l: l * 100 };
+        }
+
+        // Convert HSL to hex
+        function hslToHex(h, s, l) {
+            h = h / 360;
+            s = s / 100;
+            l = l / 100;
+
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                let p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+
+            const toHex = x => {
+                const hex = Math.round(x * 255).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+
+        // Convert hex to RGB
+        function hexToRGB(hex) {
+            let r = parseInt(hex.slice(1, 3), 16);
+            let g = parseInt(hex.slice(3, 5), 16);
+            let b = parseInt(hex.slice(5, 7), 16);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Generate color harmonies
+        function generateHarmony(baseHex, type) {
+            const baseHSL = hexToHSL(baseHex);
+            let colors = [baseHex];
+
+            switch(type) {
+                case 'complementary':
+                    colors.push(hslToHex((baseHSL.h + 180) % 360, baseHSL.s, baseHSL.l));
+                    // Add tints and shades
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s, Math.min(baseHSL.l + 20, 90)));
+                    colors.push(hslToHex((baseHSL.h + 180) % 360, baseHSL.s, Math.min(baseHSL.l + 20, 90)));
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s, Math.max(baseHSL.l - 20, 10)));
+                    break;
+
+                case 'analogous':
+                    colors.push(hslToHex((baseHSL.h + 30) % 360, baseHSL.s, baseHSL.l));
+                    colors.push(hslToHex((baseHSL.h - 30 + 360) % 360, baseHSL.s, baseHSL.l));
+                    colors.push(hslToHex((baseHSL.h + 60) % 360, baseHSL.s * 0.8, baseHSL.l));
+                    colors.push(hslToHex((baseHSL.h - 60 + 360) % 360, baseHSL.s * 0.8, baseHSL.l));
+                    break;
+
+                case 'triadic':
+                    colors.push(hslToHex((baseHSL.h + 120) % 360, baseHSL.s, baseHSL.l));
+                    colors.push(hslToHex((baseHSL.h + 240) % 360, baseHSL.s, baseHSL.l));
+                    // Add variations
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s * 0.6, baseHSL.l * 1.2));
+                    colors.push(hslToHex((baseHSL.h + 120) % 360, baseHSL.s * 0.6, baseHSL.l * 1.2));
+                    break;
+
+                case 'split-complementary':
+                    colors.push(hslToHex((baseHSL.h + 150) % 360, baseHSL.s, baseHSL.l));
+                    colors.push(hslToHex((baseHSL.h + 210) % 360, baseHSL.s, baseHSL.l));
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s * 0.7, Math.min(baseHSL.l + 15, 90)));
+                    colors.push(hslToHex((baseHSL.h + 180) % 360, baseHSL.s * 0.5, baseHSL.l));
+                    break;
+
+                case 'tetradic':
+                    colors.push(hslToHex((baseHSL.h + 90) % 360, baseHSL.s, baseHSL.l));
+                    colors.push(hslToHex((baseHSL.h + 180) % 360, baseHSL.s, baseHSL.l));
+                    colors.push(hslToHex((baseHSL.h + 270) % 360, baseHSL.s, baseHSL.l));
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s * 0.5, Math.min(baseHSL.l + 20, 90)));
+                    break;
+
+                case 'monochromatic':
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s, Math.min(baseHSL.l + 25, 90)));
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s, Math.min(baseHSL.l + 15, 85)));
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s, Math.max(baseHSL.l - 15, 15)));
+                    colors.push(hslToHex(baseHSL.h, baseHSL.s, Math.max(baseHSL.l - 25, 10)));
+                    break;
+            }
+
+            return colors;
+        }
+
+        // Generate palette
+        function generatePalette() {
+            const baseColor = document.getElementById('baseColor').value;
+            const harmonyType = document.getElementById('harmonyType').value;
+            
+            const newColors = generateHarmony(baseColor, harmonyType);
+            
+            // Preserve locked colors
+            currentPalette = newColors.map((color, index) => {
+                if (lockedColors.has(index) && currentPalette[index]) {
+                    return currentPalette[index];
+                }
+                return color;
+            });
+
+            displayPalette();
+        }
+
+        // Display palette
+        function displayPalette() {
+            const display = document.getElementById('paletteDisplay');
+            display.innerHTML = '';
+
+            currentPalette.forEach((color, index) => {
+                const card = document.createElement('div');
+                card.className = 'color-card';
+                
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color;
+                swatch.onclick = () => copyToClipboard(color);
+
+                const rerollBtn = document.createElement('button');
+                rerollBtn.className = 'reroll-icon';
+                rerollBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                rerollBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    rerollColor(index);
+                };
+
+                const lockBtn = document.createElement('button');
+                lockBtn.className = 'lock-icon' + (lockedColors.has(index) ? ' locked' : '');
+                lockBtn.innerHTML = lockedColors.has(index) ? '<i class="fas fa-lock"></i>' : '<i class="fas fa-lock-open"></i>';
+                lockBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleLock(index);
+                };
+
+                const info = document.createElement('div');
+                info.className = 'color-info';
+                
+                const hex = document.createElement('div');
+                hex.className = 'color-hex';
+                hex.textContent = color.toUpperCase();
+                hex.onclick = () => copyToClipboard(color);
+
+                const rgb = document.createElement('div');
+                rgb.className = 'color-rgb';
+                rgb.textContent = hexToRGB(color);
+
+                swatch.appendChild(rerollBtn);
+                swatch.appendChild(lockBtn);
+                info.appendChild(hex);
+                info.appendChild(rgb);
+                card.appendChild(swatch);
+                card.appendChild(info);
+                display.appendChild(card);
+            });
+        }
+
+        // Reroll a single color
+        function rerollColor(index) {
+            const baseColor = document.getElementById('baseColor').value;
+            const harmonyType = document.getElementById('harmonyType').value;
+            const baseHSL = hexToHSL(baseColor);
+            
+            // Generate a variation based on the harmony type
+            let newColor;
+            const variation = Math.random() * 60 - 30; // Random variation ±30°
+            const satVariation = Math.random() * 40 - 20; // Random saturation variation ±20%
+            const lightVariation = Math.random() * 30 - 15; // Random lightness variation ±15%
+
+            switch(harmonyType) {
+                case 'complementary':
+                    if (index % 2 === 0) {
+                        newColor = hslToHex(
+                            (baseHSL.h + variation) % 360,
+                            Math.max(10, Math.min(100, baseHSL.s + satVariation)),
+                            Math.max(10, Math.min(90, baseHSL.l + lightVariation))
+                        );
+                    } else {
+                        newColor = hslToHex(
+                            ((baseHSL.h + 180) % 360 + variation) % 360,
+                            Math.max(10, Math.min(100, baseHSL.s + satVariation)),
+                            Math.max(10, Math.min(90, baseHSL.l + lightVariation))
+                        );
+                    }
+                    break;
+
+                case 'analogous':
+                    const analogousAngles = [-60, -30, 0, 30, 60];
+                    newColor = hslToHex(
+                        (baseHSL.h + analogousAngles[index % 5] + variation) % 360,
+                        Math.max(10, Math.min(100, baseHSL.s + satVariation * 0.5)),
+                        Math.max(10, Math.min(90, baseHSL.l + lightVariation))
+                    );
+                    break;
+
+                case 'triadic':
+                    const triadicAngles = [0, 120, 240];
+                    newColor = hslToHex(
+                        (baseHSL.h + triadicAngles[index % 3] + variation) % 360,
+                        Math.max(10, Math.min(100, baseHSL.s + satVariation)),
+                        Math.max(10, Math.min(90, baseHSL.l + lightVariation))
+                    );
+                    break;
+
+                case 'split-complementary':
+                    const splitAngles = [0, 150, 210];
+                    newColor = hslToHex(
+                        (baseHSL.h + splitAngles[index % 3] + variation) % 360,
+                        Math.max(10, Math.min(100, baseHSL.s + satVariation)),
+                        Math.max(10, Math.min(90, baseHSL.l + lightVariation))
+                    );
+                    break;
+
+                case 'tetradic':
+                    const tetradicAngles = [0, 90, 180, 270];
+                    newColor = hslToHex(
+                        (baseHSL.h + tetradicAngles[index % 4] + variation) % 360,
+                        Math.max(10, Math.min(100, baseHSL.s + satVariation)),
+                        Math.max(10, Math.min(90, baseHSL.l + lightVariation))
+                    );
+                    break;
+
+                case 'monochromatic':
+                    const lightAdjustments = [0, 25, 15, -15, -25];
+                    newColor = hslToHex(
+                        baseHSL.h,
+                        Math.max(10, Math.min(100, baseHSL.s + satVariation * 0.3)),
+                        Math.max(10, Math.min(90, baseHSL.l + lightAdjustments[index % 5] + lightVariation * 0.5))
+                    );
+                    break;
+
+                default:
+                    newColor = currentPalette[index];
+            }
+
+            currentPalette[index] = newColor;
+            displayPalette();
+        }
+
+        // Toggle lock
+        function toggleLock(index) {
+            if (lockedColors.has(index)) {
+                lockedColors.delete(index);
+            } else {
+                lockedColors.add(index);
+            }
+            displayPalette();
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const notification = document.getElementById('copyNotification');
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            });
+        }
+
+        // Randomize base color
+        function randomizeBase() {
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            document.getElementById('baseColor').value = randomColor;
+            document.getElementById('baseColorHex').value = randomColor;
+            generatePalette();
+        }
+
+        // Sync color inputs
+        document.getElementById('baseColor').addEventListener('input', (e) => {
+            document.getElementById('baseColorHex').value = e.target.value;
+            generatePalette();
+        });
+
+        document.getElementById('baseColorHex').addEventListener('input', (e) => {
+            let value = e.target.value;
+            if (!value.startsWith('#')) value = '#' + value;
+            if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+                document.getElementById('baseColor').value = value;
+                generatePalette();
+            }
+        });
+
+        // Export palette
+        function exportPalette() {
+            const paletteData = {
+                baseColor: document.getElementById('baseColor').value,
+                harmonyType: document.getElementById('harmonyType').value,
+                colors: currentPalette.map(color => ({
+                    hex: color,
+                    rgb: hexToRGB(color)
+                }))
+            };
+
+            const dataStr = JSON.stringify(paletteData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'color-palette.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        generatePalette();
+    </script>
+</body>
+</html>
