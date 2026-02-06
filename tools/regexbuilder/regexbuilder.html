@@ -1,1 +1,1027 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced Regex Builder - Build regular expressions visually">
+    <title>Regex Builder - btgprojects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            /* Catppuccin Macchiato Palette */
+            --bg: #24273a;
+            --bg-alt: #1e2030;
+            --fg: #cad3f5;
+            --primary: #8aadf4;
+            --secondary: #f5bde6;
+            --highlight: #a6da95;
+            --peach: #f5a97f;
+            --yellow: #eed49f;
+            --red: #ed8796;
+            --teal: #8bd5ca;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover,
+        .back-link:focus {
+            color: var(--highlight);
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .tool-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .presets {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .presets h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            color: var(--fg);
+            border: 2px solid var(--bg);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--bg);
+        }
+
+        .builder-section {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .builder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .builder-header h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .btn-add-rule {
+            padding: 0.5rem 1rem;
+            background: var(--highlight);
+            color: var(--bg);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-rule:hover {
+            background: var(--teal);
+        }
+
+        .rules-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .rule-block {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 2px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .rule-block:hover {
+            border-color: var(--primary);
+        }
+
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .rule-number {
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .rule-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .rule-btn {
+            background: none;
+            border: none;
+            color: var(--fg);
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .rule-btn:hover {
+            background: var(--bg-alt);
+            color: var(--primary);
+        }
+
+        .rule-btn.delete:hover {
+            color: var(--red);
+        }
+
+        .rule-content {
+            display: grid;
+            grid-template-columns: 200px 1fr auto;
+            gap: 0.75rem;
+            align-items: start;
+        }
+
+        .rule-type-select {
+            padding: 0.5rem;
+            background: var(--bg-alt);
+            color: var(--fg);
+            border: 2px solid var(--bg-alt);
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .rule-type-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .rule-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .rule-input {
+            padding: 0.5rem;
+            background: var(--bg-alt);
+            color: var(--fg);
+            border: 2px solid var(--bg-alt);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .rule-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .quantifier-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .quantifier-select {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--bg-alt);
+            color: var(--fg);
+            border: 2px solid var(--bg-alt);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .quantifier-input {
+            width: 60px;
+            padding: 0.5rem;
+            background: var(--bg-alt);
+            color: var(--fg);
+            border: 2px solid var(--bg-alt);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .output-section {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .output-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .regex-display {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: var(--highlight);
+            word-break: break-all;
+            margin-bottom: 1rem;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+
+        .flags-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .flag-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .flag-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--highlight);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--bg);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--teal);
+        }
+
+        .test-section {
+            background: var(--bg-alt);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .test-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            background: var(--bg);
+            color: var(--fg);
+            border: 2px solid var(--bg);
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
+        .test-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .test-results {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 5px;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .match {
+            background: var(--highlight);
+            color: var(--bg);
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+            font-weight: 700;
+        }
+
+        .match-count {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 5px;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .footer {
+            background-color: var(--bg-alt);
+            padding: 0.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: auto;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover {
+            color: var(--highlight);
+        }
+
+        .empty-state {
+            color: var(--fg);
+            opacity: 0.5;
+            font-style: italic;
+        }
+
+        @media (max-width: 1024px) {
+            .rule-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .tool-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">btgprojects</a>
+            <a href="/" class="back-link">← Back to Home</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="tool-header">
+            <h1>🔧 Regex Builder</h1>
+            <p>Build regular expressions visually without the headache</p>
+        </div>
+
+        <div class="presets">
+            <h3>Quick Presets</h3>
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="loadPreset('email')">📧 Email</button>
+                <button class="preset-btn" onclick="loadPreset('url')">🌐 URL</button>
+                <button class="preset-btn" onclick="loadPreset('phone')">📱 Phone Number</button>
+                <button class="preset-btn" onclick="loadPreset('ipv4')">🔢 IPv4 Address</button>
+                <button class="preset-btn" onclick="loadPreset('date')">📅 Date (MM/DD/YYYY)</button>
+                <button class="preset-btn" onclick="loadPreset('time')">⏰ Time (HH:MM)</button>
+                <button class="preset-btn" onclick="loadPreset('hex')">🎨 Hex Color</button>
+                <button class="preset-btn" onclick="loadPreset('username')">👤 Username</button>
+                <button class="preset-btn" onclick="loadPreset('password')">🔒 Strong Password</button>
+            </div>
+        </div>
+
+        <div class="builder-section">
+            <div class="builder-header">
+                <h3>Build Your Pattern</h3>
+                <button class="btn-add-rule" onclick="addRule()">
+                    <i class="fas fa-plus"></i> Add Rule
+                </button>
+            </div>
+            <div class="rules-container" id="rulesContainer">
+                <div class="empty-state">Click "Add Rule" to start building your regex pattern</div>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <h3>Generated Regex</h3>
+            <div class="regex-display" id="regexDisplay">
+                <span class="empty-state">Your regex will appear here</span>
+            </div>
+            
+            <h3>Flags</h3>
+            <div class="flags-section">
+                <label class="flag-label">
+                    <input type="checkbox" id="flagGlobal" onchange="updateRegex()">
+                    <span><strong>g</strong> - Global (find all matches)</span>
+                </label>
+                <label class="flag-label">
+                    <input type="checkbox" id="flagIgnoreCase" onchange="updateRegex()">
+                    <span><strong>i</strong> - Case insensitive</span>
+                </label>
+                <label class="flag-label">
+                    <input type="checkbox" id="flagMultiline" onchange="updateRegex()">
+                    <span><strong>m</strong> - Multiline (^ and $ match line boundaries)</span>
+                </label>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="copyRegex()">
+                    <i class="fas fa-copy"></i> Copy Regex
+                </button>
+                <button class="btn btn-secondary" onclick="clearAll()">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Your Regex</h3>
+            <textarea class="test-input" id="testInput" placeholder="Enter text to test against your regex..."></textarea>
+            <div class="test-results" id="testResults">
+                <span class="empty-state">Matches will be highlighted here</span>
+            </div>
+            <div class="match-count" id="matchCount" style="display: none;"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 btgprojects. Original content by btgprojects.</p>
+        <p>Feel free to reach out via <a href="mailto:contact.btgprojects@gmail.com">email</a> or check out my <a href="https://github.com/bgrimes-me" target="_blank">GitHub</a>.</p>
+    </footer>
+
+    <script>
+        let rules = [];
+        let ruleCounter = 0;
+
+        const ruleTypes = {
+            literal: { name: 'Literal Text', hasValue: true, placeholder: 'Enter text' },
+            digit: { name: 'Digit (0-9)', hasValue: false },
+            letter: { name: 'Letter (a-z, A-Z)', hasValue: false },
+            lowercase: { name: 'Lowercase Letter (a-z)', hasValue: false },
+            uppercase: { name: 'Uppercase Letter (A-Z)', hasValue: false },
+            word: { name: 'Word Character (a-z, A-Z, 0-9, _)', hasValue: false },
+            whitespace: { name: 'Whitespace', hasValue: false },
+            anychar: { name: 'Any Character', hasValue: false },
+            charclass: { name: 'Character Class', hasValue: true, placeholder: 'e.g., a-z0-9' },
+            negcharclass: { name: 'Negated Character Class', hasValue: true, placeholder: 'e.g., a-z' },
+            startline: { name: 'Start of Line', hasValue: false, noQuantifier: true },
+            endline: { name: 'End of Line', hasValue: false, noQuantifier: true },
+            wordbound: { name: 'Word Boundary', hasValue: false, noQuantifier: true },
+            group: { name: 'Group (Capturing)', hasValue: true, placeholder: 'Group content' },
+            noncapgroup: { name: 'Group (Non-Capturing)', hasValue: true, placeholder: 'Group content' },
+            lookahead: { name: 'Lookahead (Positive)', hasValue: true, placeholder: 'Pattern' },
+            neglookahead: { name: 'Lookahead (Negative)', hasValue: true, placeholder: 'Pattern' },
+            or: { name: 'OR (Alternation)', hasValue: true, placeholder: 'option1|option2', noQuantifier: true }
+        };
+
+        const quantifiers = {
+            none: { name: 'Exactly Once', pattern: '' },
+            optional: { name: 'Optional (0 or 1)', pattern: '?' },
+            zeromore: { name: 'Zero or More (*)', pattern: '*' },
+            onemore: { name: 'One or More (+)', pattern: '+' },
+            exact: { name: 'Exactly N times', pattern: '{N}', hasInput: true },
+            range: { name: 'Between N and M times', pattern: '{N,M}', hasInputs: true },
+            atleast: { name: 'At Least N times', pattern: '{N,}', hasInput: true }
+        };
+
+        function addRule() {
+            const ruleId = ruleCounter++;
+            rules.push({
+                id: ruleId,
+                type: 'literal',
+                value: '',
+                quantifier: 'none',
+                quantifierValue: '',
+                quantifierValue2: ''
+            });
+            renderRules();
+            updateRegex();
+        }
+
+        function deleteRule(ruleId) {
+            rules = rules.filter(r => r.id !== ruleId);
+            renderRules();
+            updateRegex();
+        }
+
+        function moveRule(ruleId, direction) {
+            const index = rules.findIndex(r => r.id === ruleId);
+            if (direction === 'up' && index > 0) {
+                [rules[index], rules[index - 1]] = [rules[index - 1], rules[index]];
+            } else if (direction === 'down' && index < rules.length - 1) {
+                [rules[index], rules[index + 1]] = [rules[index + 1], rules[index]];
+            }
+            renderRules();
+            updateRegex();
+        }
+
+        function updateRuleType(ruleId, type) {
+            const rule = rules.find(r => r.id === ruleId);
+            if (rule) {
+                rule.type = type;
+                rule.value = '';
+                renderRules();
+                updateRegex();
+            }
+        }
+
+        function updateRuleValue(ruleId, value) {
+            const rule = rules.find(r => r.id === ruleId);
+            if (rule) {
+                rule.value = value;
+                updateRegex();
+            }
+        }
+
+        function updateRuleQuantifier(ruleId, quantifier) {
+            const rule = rules.find(r => r.id === ruleId);
+            if (rule) {
+                rule.quantifier = quantifier;
+                renderRules();
+                updateRegex();
+            }
+        }
+
+        function updateRuleQuantifierValue(ruleId, value, isSecond = false) {
+            const rule = rules.find(r => r.id === ruleId);
+            if (rule) {
+                if (isSecond) {
+                    rule.quantifierValue2 = value;
+                } else {
+                    rule.quantifierValue = value;
+                }
+                updateRegex();
+            }
+        }
+
+        function renderRules() {
+            const container = document.getElementById('rulesContainer');
+            
+            if (rules.length === 0) {
+                container.innerHTML = '<div class="empty-state">Click "Add Rule" to start building your regex pattern</div>';
+                return;
+            }
+
+            container.innerHTML = rules.map((rule, index) => {
+                const ruleType = ruleTypes[rule.type];
+                const quantifier = quantifiers[rule.quantifier];
+                
+                let valueInput = '';
+                if (ruleType.hasValue) {
+                    valueInput = `<input type="text" class="rule-input" placeholder="${ruleType.placeholder}" value="${rule.value}" oninput="updateRuleValue(${rule.id}, this.value)">`;
+                }
+
+                let quantifierInputs = '';
+                if (quantifier.hasInput) {
+                    quantifierInputs = `<input type="number" class="quantifier-input" min="1" value="${rule.quantifierValue || 1}" oninput="updateRuleQuantifierValue(${rule.id}, this.value)">`;
+                } else if (quantifier.hasInputs) {
+                    quantifierInputs = `
+                        <input type="number" class="quantifier-input" min="0" value="${rule.quantifierValue || 1}" oninput="updateRuleQuantifierValue(${rule.id}, this.value)" placeholder="Min">
+                        <span>to</span>
+                        <input type="number" class="quantifier-input" min="1" value="${rule.quantifierValue2 || 5}" oninput="updateRuleQuantifierValue(${rule.id}, this.value, true)" placeholder="Max">
+                    `;
+                }
+
+                const showQuantifier = !ruleType.noQuantifier;
+
+                return `
+                    <div class="rule-block">
+                        <div class="rule-header">
+                            <span class="rule-number">Rule ${index + 1}</span>
+                            <div class="rule-controls">
+                                ${index > 0 ? `<button class="rule-btn" onclick="moveRule(${rule.id}, 'up')" title="Move up"><i class="fas fa-arrow-up"></i></button>` : ''}
+                                ${index < rules.length - 1 ? `<button class="rule-btn" onclick="moveRule(${rule.id}, 'down')" title="Move down"><i class="fas fa-arrow-down"></i></button>` : ''}
+                                <button class="rule-btn delete" onclick="deleteRule(${rule.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="rule-content">
+                            <select class="rule-type-select" onchange="updateRuleType(${rule.id}, this.value)">
+                                ${Object.entries(ruleTypes).map(([key, val]) => 
+                                    `<option value="${key}" ${rule.type === key ? 'selected' : ''}>${val.name}</option>`
+                                ).join('')}
+                            </select>
+                            <div class="rule-options">
+                                ${valueInput}
+                                ${showQuantifier ? `
+                                <div class="quantifier-group">
+                                    <select class="quantifier-select" onchange="updateRuleQuantifier(${rule.id}, this.value)">
+                                        ${Object.entries(quantifiers).map(([key, val]) => 
+                                            `<option value="${key}" ${rule.quantifier === key ? 'selected' : ''}>${val.name}</option>`
+                                        ).join('')}
+                                    </select>
+                                    ${quantifierInputs}
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function buildRegexPattern() {
+            let pattern = '';
+            
+            for (const rule of rules) {
+                let segment = '';
+                const ruleType = ruleTypes[rule.type];
+                
+                switch (rule.type) {
+                    case 'literal':
+                        segment = rule.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        break;
+                    case 'digit':
+                        segment = '\\d';
+                        break;
+                    case 'letter':
+                        segment = '[a-zA-Z]';
+                        break;
+                    case 'lowercase':
+                        segment = '[a-z]';
+                        break;
+                    case 'uppercase':
+                        segment = '[A-Z]';
+                        break;
+                    case 'word':
+                        segment = '\\w';
+                        break;
+                    case 'whitespace':
+                        segment = '\\s';
+                        break;
+                    case 'anychar':
+                        segment = '.';
+                        break;
+                    case 'charclass':
+                        segment = `[${rule.value}]`;
+                        break;
+                    case 'negcharclass':
+                        segment = `[^${rule.value}]`;
+                        break;
+                    case 'startline':
+                        segment = '^';
+                        break;
+                    case 'endline':
+                        segment = '$';
+                        break;
+                    case 'wordbound':
+                        segment = '\\b';
+                        break;
+                    case 'group':
+                        segment = `(${rule.value})`;
+                        break;
+                    case 'noncapgroup':
+                        segment = `(?:${rule.value})`;
+                        break;
+                    case 'lookahead':
+                        segment = `(?=${rule.value})`;
+                        break;
+                    case 'neglookahead':
+                        segment = `(?!${rule.value})`;
+                        break;
+                    case 'or':
+                        segment = rule.value;
+                        break;
+                }
+
+                // Add quantifier
+                if (!ruleType.noQuantifier && segment) {
+                    const quantifier = quantifiers[rule.quantifier];
+                    if (quantifier.pattern) {
+                        if (quantifier.hasInput) {
+                            segment += quantifier.pattern.replace('N', rule.quantifierValue || 1);
+                        } else if (quantifier.hasInputs) {
+                            segment += quantifier.pattern
+                                .replace('N', rule.quantifierValue || 1)
+                                .replace('M', rule.quantifierValue2 || 5);
+                        } else {
+                            segment += quantifier.pattern;
+                        }
+                    }
+                }
+
+                pattern += segment;
+            }
+
+            return pattern;
+        }
+
+        function updateRegex() {
+            const pattern = buildRegexPattern();
+            const display = document.getElementById('regexDisplay');
+            
+            if (pattern) {
+                display.innerHTML = `/${pattern}/${getFlags()}`;
+                display.style.color = 'var(--highlight)';
+            } else {
+                display.innerHTML = '<span class="empty-state">Your regex will appear here</span>';
+            }
+
+            testRegex();
+        }
+
+        function getFlags() {
+            let flags = '';
+            if (document.getElementById('flagGlobal').checked) flags += 'g';
+            if (document.getElementById('flagIgnoreCase').checked) flags += 'i';
+            if (document.getElementById('flagMultiline').checked) flags += 'm';
+            return flags;
+        }
+
+        function copyRegex() {
+            const pattern = buildRegexPattern();
+            if (!pattern) {
+                alert('No regex to copy! Add some rules first.');
+                return;
+            }
+            
+            const regexString = `/${pattern}/${getFlags()}`;
+            navigator.clipboard.writeText(regexString).then(() => {
+                alert('Regex copied to clipboard!');
+            });
+        }
+
+        function clearAll() {
+            if (rules.length > 0 && !confirm('Clear all rules?')) return;
+            rules = [];
+            ruleCounter = 0;
+            document.getElementById('flagGlobal').checked = false;
+            document.getElementById('flagIgnoreCase').checked = false;
+            document.getElementById('flagMultiline').checked = false;
+            document.getElementById('testInput').value = '';
+            renderRules();
+            updateRegex();
+        }
+
+        function testRegex() {
+            const pattern = buildRegexPattern();
+            const testInput = document.getElementById('testInput').value;
+            const resultsDiv = document.getElementById('testResults');
+            const matchCountDiv = document.getElementById('matchCount');
+
+            if (!pattern || !testInput) {
+                resultsDiv.innerHTML = '<span class="empty-state">Matches will be highlighted here</span>';
+                matchCountDiv.style.display = 'none';
+                return;
+            }
+
+            try {
+                const flags = getFlags();
+                const regex = new RegExp(pattern, flags);
+                const matches = testInput.match(new RegExp(pattern, flags + (flags.includes('g') ? '' : 'g')));
+                
+                if (matches && matches.length > 0) {
+                    let highlighted = testInput;
+                    const uniqueMatches = [...new Set(matches)];
+                    
+                    // Sort by length (longest first) to avoid partial replacements
+                    uniqueMatches.sort((a, b) => b.length - a.length);
+                    
+                    for (const match of uniqueMatches) {
+                        const escaped = match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        highlighted = highlighted.replace(new RegExp(escaped, 'g'), `<span class="match">${match}</span>`);
+                    }
+                    
+                    resultsDiv.innerHTML = highlighted;
+                    matchCountDiv.innerHTML = `Found ${matches.length} match${matches.length === 1 ? '' : 'es'}`;
+                    matchCountDiv.style.display = 'block';
+                } else {
+                    resultsDiv.innerHTML = testInput;
+                    matchCountDiv.innerHTML = 'No matches found';
+                    matchCountDiv.style.display = 'block';
+                }
+            } catch (e) {
+                resultsDiv.innerHTML = `<span style="color: var(--red)">Invalid regex: ${e.message}</span>`;
+                matchCountDiv.style.display = 'none';
+            }
+        }
+
+        // Auto-test on input
+        document.getElementById('testInput').addEventListener('input', testRegex);
+
+        function loadPreset(preset) {
+            rules = [];
+            ruleCounter = 0;
+
+            const presets = {
+                email: [
+                    { type: 'charclass', value: 'a-zA-Z0-9._%+-', quantifier: 'onemore' },
+                    { type: 'literal', value: '@', quantifier: 'none' },
+                    { type: 'charclass', value: 'a-zA-Z0-9.-', quantifier: 'onemore' },
+                    { type: 'literal', value: '.', quantifier: 'none' },
+                    { type: 'charclass', value: 'a-zA-Z', quantifier: 'range', quantifierValue: '2', quantifierValue2: '6' }
+                ],
+                url: [
+                    { type: 'group', value: 'https?', quantifier: 'none' },
+                    { type: 'literal', value: '://', quantifier: 'none' },
+                    { type: 'charclass', value: 'a-zA-Z0-9.-', quantifier: 'onemore' },
+                    { type: 'charclass', value: '/?#', quantifier: 'zeromore' },
+                    { type: 'anychar', value: '', quantifier: 'zeromore' }
+                ],
+                phone: [
+                    { type: 'group', value: '\\d{3}', quantifier: 'none' },
+                    { type: 'charclass', value: '-. ', quantifier: 'optional' },
+                    { type: 'group', value: '\\d{3}', quantifier: 'none' },
+                    { type: 'charclass', value: '-. ', quantifier: 'optional' },
+                    { type: 'group', value: '\\d{4}', quantifier: 'none' }
+                ],
+                ipv4: [
+                    { type: 'group', value: '25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?', quantifier: 'none' },
+                    { type: 'literal', value: '.', quantifier: 'none' },
+                    { type: 'group', value: '25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?', quantifier: 'none' },
+                    { type: 'literal', value: '.', quantifier: 'none' },
+                    { type: 'group', value: '25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?', quantifier: 'none' },
+                    { type: 'literal', value: '.', quantifier: 'none' },
+                    { type: 'group', value: '25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?', quantifier: 'none' }
+                ],
+                date: [
+                    { type: 'digit', value: '', quantifier: 'exact', quantifierValue: '2' },
+                    { type: 'literal', value: '/', quantifier: 'none' },
+                    { type: 'digit', value: '', quantifier: 'exact', quantifierValue: '2' },
+                    { type: 'literal', value: '/', quantifier: 'none' },
+                    { type: 'digit', value: '', quantifier: 'exact', quantifierValue: '4' }
+                ],
+                time: [
+                    { type: 'group', value: '[01]?[0-9]|2[0-3]', quantifier: 'none' },
+                    { type: 'literal', value: ':', quantifier: 'none' },
+                    { type: 'group', value: '[0-5][0-9]', quantifier: 'none' }
+                ],
+                hex: [
+                    { type: 'literal', value: '#', quantifier: 'none' },
+                    { type: 'charclass', value: '0-9A-Fa-f', quantifier: 'exact', quantifierValue: '6' }
+                ],
+                username: [
+                    { type: 'startline', value: '', quantifier: 'none' },
+                    { type: 'charclass', value: 'a-zA-Z0-9_-', quantifier: 'range', quantifierValue: '3', quantifierValue2: '16' },
+                    { type: 'endline', value: '', quantifier: 'none' }
+                ],
+                password: [
+                    { type: 'startline', value: '', quantifier: 'none' },
+                    { type: 'lookahead', value: '.*[A-Z]', quantifier: 'none' },
+                    { type: 'lookahead', value: '.*[a-z]', quantifier: 'none' },
+                    { type: 'lookahead', value: '.*\\d', quantifier: 'none' },
+                    { type: 'lookahead', value: '.*[!@#$%^&*]', quantifier: 'none' },
+                    { type: 'charclass', value: 'A-Za-z\\d!@#$%^&*', quantifier: 'atleast', quantifierValue: '8' },
+                    { type: 'endline', value: '', quantifier: 'none' }
+                ]
+            };
+
+            const presetRules = presets[preset];
+            if (presetRules) {
+                rules = presetRules.map((rule, index) => ({
+                    id: ruleCounter++,
+                    ...rule
+                }));
+                renderRules();
+                updateRegex();
+            }
+        }
+    </script>
+</body>
+</html>
